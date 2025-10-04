@@ -1,11 +1,21 @@
 package com.hanguyen.demo_spring_bai1.dto.request;
 
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public class UserUpdateRequest {
-    private String password ;
+
+    @Size(min = 8, max = 100, message = "Password must be at least 8 characters")
+    private String password;
+
+    @Size(max = 50, message = "First name must be less than 50 characters")
     private String firstname;
-    private String lastname ;
+
+    @Size(max = 50, message = "Last name must be less than 50 characters")
+    private String lastname;
+
+    @Past(message = "Date of birth must be in the past")
     private LocalDate dod;
 
     public LocalDate getDod() {
