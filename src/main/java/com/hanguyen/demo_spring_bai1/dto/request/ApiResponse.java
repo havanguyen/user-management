@@ -1,52 +1,104 @@
 package com.hanguyen.demo_spring_bai1.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.Data;
+import org.springframework.http.HttpStatus;
+
+import java.time.Instant;
 import java.util.List;
 
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({"status", "message", "data", "timestamp", "path"})
 public class ApiResponse<T> {
-    private int status;
-    private boolean success;
+
+    @JsonProperty("status")
+    private int statusCode;
+
     private String message;
-    private LocalDateTime timestamp = LocalDateTime.now();
     private T data;
-    private List<ValidationError> errors;
+    private Instant timestamp;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class ValidationError {
-        private String field;
-        private String message;
+    @JsonIgnore
+    private HttpStatus httpStatus;
 
-        public ValidationError() {}
-
-        public ValidationError(String field, String message) {
-            this.field = field;
-            this.message = message;
-        }
-
-        public String getField() { return field; }
-        public void setField(String field) { this.field = field; }
-
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
+    private ApiResponse() {
+        this.timestamp = Instant.now();
+    }
+    public static <T> ApiResponse<T> ok(T data) {
+        return of(HttpStatus.OK, "Success", data);
     }
 
-    public int getStatus() { return status; }
-    public void setStatus(int status) { this.status = status; }
+    public static <T> ApiResponse<T> ok(String message, T data) {
+        return of(HttpStatus.OK, message, data);
+    }
 
-    public boolean isSuccess() { return success; }
-    public void setSuccess(boolean success) { this.success = success; }
+    public static <T> ApiResponse<T> created(T data) {
+        return of(HttpStatus.CREATED, "Created successfully", data);
+    }
 
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
+    public static <T> ApiResponse<T> created(String message, T data) {
+        return of(HttpStatus.CREATED, message, data);
+    }
 
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+    public static <T> ApiResponse<T> noContent() {
+        return of(HttpStatus.NO_CONTENT, "No content", null);
+    }
+    public static <T> ApiResponse<T> error(HttpStatus status, String message) {
+        return of(status, message, null);
+    }
 
-    public T getData() { return data; }
-    public void setData(T data) { this.data = data; }
+    public static <T> ApiResponse<T> error(HttpStatus status, String message, T data) {
+        return of(status, message, data);
+    }
 
-    public List<ValidationError> getErrors() { return errors; }
-    public void setErrors(List<ValidationError> errors) { this.errors = errors; }
+    public static <T> ApiResponse<T> badRequest(String message) {
+        return error(HttpStatus.BAD_REQUEST, message);
+    }
+
+    public static <T> ApiResponse<T> notFound(String message) {
+        return error(HttpStatus.NOT_FOUND, message);
+    }
+
+    public static <T> ApiResponse<T> unauthorized(String message) {
+        return error(HttpStatus.UNAUTHORIZED, message);
+    }
+
+    public static <T> ApiResponse<T> forbidden(String message) {
+        return error(HttpStatus.FORBIDDEN, message);
+    }
+
+    public static <T> ApiResponse<T> internalError(String message) {
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, message);
+    }
+
+    public static <T> ApiResponse<T> conflict(String message) {
+        return error(HttpStatus.CONFLICT, message);
+    }
+
+    private static <T> ApiResponse<T> of(HttpStatus httpStatus, String message, T data) {
+        ApiResponse<T> response = new ApiResponse<>();
+        response.httpStatus = httpStatus;
+        response.statusCode = httpStatus.value();
+        response.message = message;
+        response.data = data;
+        return response;
+    }
+
+
+    public ApiResponse<T> withPath(String path) {
+        return this;
+    }
+
+    public ApiResponse<T> withRequestId(String requestId) {
+        return this;
+    }
+
+    @JsonIgnore
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
 }
