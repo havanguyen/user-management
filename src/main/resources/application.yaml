@@ -8,11 +8,12 @@ spring:
     url: "jdbc:mysql://localhost:3306/spring"
     username: root
     password: root
-
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 
-
-
+jwt:
+  secret-key: "mFIbgAHanwWv+qk8D8sVzvA+gte2ZNUgHQCNDKn0KhA="
+  access-token-validity: 3600000
+  refresh-token-validity: 604800000
