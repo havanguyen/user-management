@@ -4,6 +4,7 @@ import com.hanguyen.demo_spring_bai1.dto.request.AuthRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.RegisterRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.AuthResponse;
 import com.hanguyen.demo_spring_bai1.entity.User;
+import com.hanguyen.demo_spring_bai1.enums.Roles;
 import com.hanguyen.demo_spring_bai1.repository.UserRepository;
 import com.hanguyen.demo_spring_bai1.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +35,8 @@ public class AuthService {
             User user = userRepository.findByUsername(request.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            String accessToken = jwtTokenProvider.generateToken(user.getUsername());
-            String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
+            String accessToken = jwtTokenProvider.generateToken(user.getUsername() , user.getRoles());
+            String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername() , user.getRoles());
 
             return AuthResponse.builder()
                     .authenticated(true)
@@ -60,10 +63,15 @@ public class AuthService {
                 .dod(null)
                 .build();
 
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Roles.USER.name());
+
+        user.setRoles(roles);
+
         User savedUser = userRepository.save(user);
 
-        String accessToken = jwtTokenProvider.generateToken(savedUser.getUsername());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(savedUser.getUsername());
+        String accessToken = jwtTokenProvider.generateToken(savedUser.getUsername() , savedUser.getRoles());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(savedUser.getUsername() , savedUser.getRoles());
 
         return AuthResponse.builder()
                 .authenticated(true)

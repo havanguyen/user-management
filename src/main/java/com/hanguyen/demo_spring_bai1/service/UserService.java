@@ -5,16 +5,16 @@ import com.hanguyen.demo_spring_bai1.dto.request.UserCreationRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.UserUpdateRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.UserResponse;
 import com.hanguyen.demo_spring_bai1.entity.User;
+import com.hanguyen.demo_spring_bai1.enums.Roles;
 import com.hanguyen.demo_spring_bai1.mapper.UserMapper;
 import com.hanguyen.demo_spring_bai1.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -23,16 +23,19 @@ import java.util.List;
 public class UserService {
     UserRepository userRepository ;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
 
     public User createUser(UserCreationRequest request){
         if(userRepository.existsByUsername(request.getUsername())){
             throw  new RuntimeException("User existed");
         }
-
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         User user = userMapper.toUser(request);
-
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Roles.USER.name());
+
+        user.setRoles(roles);
         return  userRepository.save(user) ;
     }
 

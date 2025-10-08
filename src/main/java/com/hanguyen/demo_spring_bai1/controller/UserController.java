@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,10 @@ public class UserController {
 
     @GetMapping
     public List<User> getAllUsers() {
+
+       var auth = SecurityContextHolder.getContext().getAuthentication();
+
+
         return userService.getAllUser();
     }
 

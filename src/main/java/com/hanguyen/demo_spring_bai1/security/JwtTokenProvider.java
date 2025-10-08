@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Set;
+import java.util.StringJoiner;
 
 @Slf4j
 @Component
@@ -38,19 +40,20 @@ public class JwtTokenProvider {
         }
     }
 
-    public String generateToken(String username) {
-        return generateTokenWithExpiration(username, accessTokenValidity);
+    public String generateToken(String username , Set<String> roles ) {
+        return generateTokenWithExpiration(username, roles , accessTokenValidity);
     }
 
-    public String generateRefreshToken(String username) {
-        return generateTokenWithExpiration(username, refreshTokenValidity);
+    public String generateRefreshToken(String username ,Set<String> roles ) {
+        return generateTokenWithExpiration(username,roles , refreshTokenValidity);
     }
 
-    private String generateTokenWithExpiration(String username, long validity) {
+    private String generateTokenWithExpiration(String username, Set<String> roles , long validity) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + validity);
 
         return Jwts.builder()
+                .claim("scope" , buildScope(roles))
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
@@ -86,5 +89,13 @@ public class JwtTokenProvider {
             log.warn("Invalid JWT token: {}", e.getMessage());
             return false;
         }
+    }
+
+    private String buildScope(Set<String> roles){
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if(!roles.isEmpty()){
+            roles.forEach(stringJoiner::add);
+        }
+        return  stringJoiner.toString();
     }
 }
