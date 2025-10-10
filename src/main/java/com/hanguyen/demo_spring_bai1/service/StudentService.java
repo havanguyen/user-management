@@ -59,7 +59,7 @@ public class StudentService {
         return MyScheduleResponse.builder()
                 .studentCode(student.getStudentCode())
                 .studentName(student.getUser().getFirstname() + " " + student.getUser().getLastname())
-                .semesterName(enrollments.isEmpty() ? "N/A" : enrollments.getFirst().getCourse().getSemester().getName())
+                .semesterName(enrollments.isEmpty() ? "N/A" : enrollments.get(0).getCourse().getSemester().getName())
                 .scheduleItems(scheduleItems)
                 .build();
     }

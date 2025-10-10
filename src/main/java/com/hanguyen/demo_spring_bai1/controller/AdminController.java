@@ -31,10 +31,6 @@ public class AdminController {
     private final CourseService courseService;
     private final RegistrationPeriodService registrationPeriodService;
 
-    // ========================
-    // == Semester Management ==
-    // ========================
-
     @PostMapping("/semesters")
     public ApiResponse<Semester> createSemester(@Valid @RequestBody SemesterRequest request) {
         return ApiResponse.created("Semester created successfully", semesterService.createSemester(request));
@@ -50,10 +46,6 @@ public class AdminController {
         return ApiResponse.ok(semesterService.getSemesterById(id));
     }
 
-    // ========================
-    // == Subject Management ==
-    // ========================
-
     @PostMapping("/subjects")
     public ApiResponse<Subject> createSubject(@Valid @RequestBody SubjectRequest request) {
         return ApiResponse.created("Subject created successfully", subjectService.createSubject(request));
@@ -68,10 +60,6 @@ public class AdminController {
     public ApiResponse<Subject> getSubjectById(@PathVariable String id) {
         return ApiResponse.ok(subjectService.getSubjectById(id));
     }
-
-    // =======================
-    // == Course Management ==
-    // =======================
 
     @PostMapping("/courses")
     public ApiResponse<Course> createCourse(@Valid @RequestBody CourseRequest request) {

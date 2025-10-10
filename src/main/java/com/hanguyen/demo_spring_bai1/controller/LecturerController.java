@@ -16,13 +16,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/lecturer")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('LECTURER')")
 public class LecturerController {
 
     private final LecturerService lecturerService;
 
-    @PreAuthorize("authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
     @GetMapping("/{lecturerId}/courses")
+    @PreAuthorize("hasRole('LECTURER') and authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
     public ApiResponse<List<Course>> getAssignedCourses(
             @PathVariable String lecturerId,
             @RequestParam String semesterId
@@ -31,8 +30,8 @@ public class LecturerController {
         return ApiResponse.ok("Assigned courses fetched successfully", courses);
     }
 
-    @PreAuthorize("authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
     @GetMapping("/{lecturerId}/courses/{courseId}/students")
+    @PreAuthorize("hasRole('LECTURER') and authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
     public ApiResponse<List<StudentInCourseResponse>> getStudentList(
             @PathVariable String lecturerId,
             @PathVariable String courseId
@@ -41,8 +40,8 @@ public class LecturerController {
         return ApiResponse.ok("Student list fetched successfully", students);
     }
 
-    @PreAuthorize("authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
     @PutMapping("/{lecturerId}/grades")
+    @PreAuthorize("hasRole('LECTURER') and authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
     public ApiResponse<Enrollment> updateGrade(
             @PathVariable String lecturerId,
             @Valid @RequestBody GradeUpdateRequest request

@@ -14,19 +14,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/student")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('STUDENT')")
 public class StudentController {
 
     private final StudentService studentService;
 
     @GetMapping("/courses/open-for-registration")
+    @PreAuthorize("hasRole('STUDENT')")
     public ApiResponse<List<Course>> getOpenCourses() {
         List<Course> openCourses = studentService.getOpenCoursesForRegistration();
         return ApiResponse.ok("Open courses fetched successfully", openCourses);
     }
 
-    @PreAuthorize("authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     @GetMapping("/{studentId}/schedule")
+    @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     public ApiResponse<MyScheduleResponse> getMySchedule(
             @PathVariable String studentId,
             @RequestParam String semesterId
@@ -35,8 +35,8 @@ public class StudentController {
         return ApiResponse.ok("Schedule fetched successfully", schedule);
     }
 
-    @PreAuthorize("authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     @PostMapping("/{studentId}/enrollments")
+    @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     public ApiResponse<Enrollment> registerCourse(
             @PathVariable String studentId,
             @RequestParam String courseId
@@ -45,8 +45,8 @@ public class StudentController {
         return ApiResponse.created("Course registered successfully", enrollment);
     }
 
-    @PreAuthorize("authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     @DeleteMapping("/{studentId}/enrollments/{enrollmentId}")
+    @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     public ApiResponse<Void> dropCourse(
             @PathVariable String studentId,
             @PathVariable String enrollmentId
