@@ -1,6 +1,5 @@
 package com.hanguyen.demo_spring_bai1.service;
 
-
 import com.hanguyen.demo_spring_bai1.dto.request.UserCreationRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.UserUpdateRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.UserResponse;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set; // Import thêm Set
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +32,10 @@ public class UserService {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Roles.USER.name());
+        // --- SỬA LỖI Ở ĐÂY ---
+        Set<Roles> roles = new HashSet<>(); // Đổi từ HashSet<String> sang Set<Roles>
+        roles.add(Roles.USER); // Thêm trực tiếp Enum, không cần .name()
+        // ---------------------
 
         user.setRoles(roles);
         return  userRepository.save(user) ;

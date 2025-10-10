@@ -27,21 +27,22 @@ public class ApplicationInitConfig {
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository){
         return  args -> {
-                if(userRepository.findByUsername("superadmin").isEmpty()){
-                    Set<String> roles = new HashSet<>();
+            if(userRepository.findByUsername("superadmin").isEmpty()){
+                // --- SỬA LỖI Ở ĐÂY ---
+                Set<Roles> roles = new HashSet<>(); // Đổi từ Set<String> sang Set<Roles>
+                roles.add(Roles.ADMIN); // Thêm trực tiếp Enum
+                // ---------------------
 
-                    roles.add(Roles.ADMIN.name());
+                User user = User.builder()
+                        .username("superadmin")
+                        .password(passwordEncoder.encode("SuperAdmin123!"))
+                        .roles(roles)
+                        .build();
 
-                    User user = User.builder()
-                            .username("superadmin")
-                            .password(passwordEncoder.encode("SuperAdmin123!"))
-                            .roles(roles)
-                            .build();
+                userRepository.save(user);
 
-                    userRepository.save(user);
-
-                    log.warn("admin account has been created with default password , please change it .");
-                }
+                log.warn("admin account has been created with default password , please change it .");
+            }
         };
     }
 }

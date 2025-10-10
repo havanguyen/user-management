@@ -1,9 +1,13 @@
 package com.hanguyen.demo_spring_bai1.dto.request;
 
+import com.hanguyen.demo_spring_bai1.enums.Roles;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -11,18 +15,30 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterRequest {
-
     @NotBlank(message = "Username cannot be blank")
-    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
+    @Size(min = 3, max = 20)
     String username;
 
     @NotBlank(message = "Password cannot be blank")
-    @Size(min = 8, max = 100, message = "Password must be at least 8 characters")
+    @Size(min = 8, max = 100)
     String password;
 
-    @NotBlank(message = "First name cannot be blank")
+    @NotBlank
     String firstname;
 
-    @NotBlank(message = "Last name cannot be blank")
+    @NotBlank
     String lastname;
+
+    LocalDate dod;
+
+    @NotNull(message = "Role must be specified")
+    Roles role;
+
+    String studentCode;
+    Integer enrollmentYear;
+    String majorId;
+
+    String lecturerCode;
+    String degree;
+    String departmentId;
 }

@@ -1,16 +1,12 @@
 package com.hanguyen.demo_spring_bai1.entity;
 
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.hanguyen.demo_spring_bai1.enums.Roles; // Import Enum
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.Set;
-
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
@@ -21,11 +17,15 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String id ;
-    String username ;
-    String password ;
+    String id;
+    String username;
+    String password;
     String firstname;
-    String lastname ;
+    String lastname;
     LocalDate dod;
-    Set<String> roles;
+
+    @ElementCollection(targetClass = Roles.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    Set<Roles> roles;
 }
