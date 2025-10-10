@@ -28,10 +28,8 @@ public class ApplicationInitConfig {
     ApplicationRunner applicationRunner(UserRepository userRepository){
         return  args -> {
             if(userRepository.findByUsername("superadmin").isEmpty()){
-                // --- SỬA LỖI Ở ĐÂY ---
-                Set<Roles> roles = new HashSet<>(); // Đổi từ Set<String> sang Set<Roles>
-                roles.add(Roles.ADMIN); // Thêm trực tiếp Enum
-                // ---------------------
+                Set<Roles> roles = new HashSet<>();
+                roles.add(Roles.ADMIN);
 
                 User user = User.builder()
                         .username("superadmin")
