@@ -2,6 +2,7 @@ package com.hanguyen.demo_spring_bai1.controller;
 
 import com.hanguyen.demo_spring_bai1.dto.request.ApiResponse;
 import com.hanguyen.demo_spring_bai1.dto.request.AuthRequest;
+import com.hanguyen.demo_spring_bai1.dto.request.RefreshTokenRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.RegisterRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.AuthResponse;
 import com.hanguyen.demo_spring_bai1.service.AuthService;
@@ -28,5 +29,17 @@ public class AuthController {
     public ApiResponse<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ApiResponse.created("User registered successfully", response);
+    }
+
+    @PostMapping("/refresh")
+    public ApiResponse<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        AuthResponse response = authService.refreshToken(request);
+        return ApiResponse.ok("Token refreshed successfully", response);
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@RequestBody RefreshTokenRequest request) {
+        authService.logout(request);
+        return ApiResponse.ok("Logged out successfully", null);
     }
 }

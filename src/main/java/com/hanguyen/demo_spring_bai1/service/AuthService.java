@@ -1,6 +1,7 @@
 package com.hanguyen.demo_spring_bai1.service;
 
 import com.hanguyen.demo_spring_bai1.dto.request.AuthRequest;
+import com.hanguyen.demo_spring_bai1.dto.request.RefreshTokenRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.RegisterRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.AuthResponse;
 import com.hanguyen.demo_spring_bai1.entity.*;
@@ -30,9 +31,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final StudentRepository studentRepository;
     private final LecturerRepository lecturerRepository;
-    // --- BƯỚC 1: INJECT REPOSITORIES MỚI ---
     private final MajorRepository majorRepository;
     private final DepartmentRepository departmentRepository;
+    private final RefreshTokenService refreshTokenService; // Đã thêm
+    private final RefreshTokenRepository refreshTokenRepository; // Đã thêm
 
     public AuthResponse login(AuthRequest request) {
         try {
@@ -44,18 +46,45 @@ public class AuthService {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             String accessToken = jwtTokenProvider.generateToken(user.getUsername(), user.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));
-            String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername(), user.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));
+
+            // Tạo refresh token bằng RefreshTokenService
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
 
             return AuthResponse.builder()
                     .authenticated(true)
                     .access_token(accessToken)
-                    .refresh_token(refreshToken)
+                    .refresh_token(refreshToken.getToken()) // Lấy token string
                     .user(user)
                     .build();
 
         } catch (AuthenticationException e) {
             throw new RuntimeException("Invalid username or password");
         }
+    }
+
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getToken())
+                .orElseThrow(() -> new BusinessException("Refresh token not found"));
+
+        refreshTokenService.verifyExpiration(refreshToken);
+
+        User user = refreshToken.getUser();
+        String newAccessToken = jwtTokenProvider.generateToken(user.getUsername(),
+                user.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));
+
+        return AuthResponse.builder()
+                .authenticated(true)
+                .access_token(newAccessToken)
+                .refresh_token(refreshToken.getToken())
+                .user(user)
+                .build();
+    }
+
+    @Transactional
+    public void logout(RefreshTokenRequest request) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getToken())
+                .orElseThrow(() -> new BusinessException("Refresh token not found"));
+        refreshTokenRepository.delete(refreshToken);
     }
 
     @Transactional
@@ -76,7 +105,6 @@ public class AuthService {
         user.getRoles().add(request.getRole());
         User savedUser = userRepository.save(user);
 
-        // --- BƯỚC 2, 3, 4, 5: SỬA LOGIC TRONG SWITCH-CASE ---
         switch (request.getRole()) {
             case STUDENT:
                 if (request.getMajorId() == null) {
@@ -89,7 +117,7 @@ public class AuthService {
                         .user(savedUser)
                         .studentCode(request.getStudentCode())
                         .enrollmentYear(request.getEnrollmentYear())
-                        .major(major) // Gán đối tượng Major đã tìm được
+                        .major(major)
                         .build();
                 studentRepository.save(studentProfile);
                 break;
@@ -105,7 +133,7 @@ public class AuthService {
                         .user(savedUser)
                         .lecturerCode(request.getLecturerCode())
                         .degree(request.getDegree())
-                        .department(department) // Gán đối tượng Department đã tìm được
+                        .department(department)
                         .build();
                 lecturerRepository.save(lecturerProfile);
                 break;
@@ -117,12 +145,12 @@ public class AuthService {
         }
 
         String accessToken = jwtTokenProvider.generateToken(savedUser.getUsername(), savedUser.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));
-        String refreshToken = jwtTokenProvider.generateRefreshToken(savedUser.getUsername(), savedUser.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser.getUsername());
 
         return AuthResponse.builder()
                 .authenticated(true)
                 .access_token(accessToken)
-                .refresh_token(refreshToken)
+                .refresh_token(refreshToken.getToken())
                 .user(savedUser)
                 .build();
     }
