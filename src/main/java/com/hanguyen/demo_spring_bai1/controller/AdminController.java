@@ -15,6 +15,7 @@ import com.hanguyen.demo_spring_bai1.service.accademic.SemesterService;
 import com.hanguyen.demo_spring_bai1.service.accademic.SubjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
-// Lưu ý: Chúng ta sẽ thêm phần bảo mật (@PreAuthorize("hasRole('ADMIN')")) ở Giai đoạn 9
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final SemesterService semesterService;

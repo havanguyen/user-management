@@ -3,14 +3,10 @@ package com.hanguyen.demo_spring_bai1.service;
 import com.hanguyen.demo_spring_bai1.dto.request.AuthRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.RegisterRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.AuthResponse;
-import com.hanguyen.demo_spring_bai1.entity.Lecturer;
-import com.hanguyen.demo_spring_bai1.entity.Student;
-import com.hanguyen.demo_spring_bai1.entity.User;
-import com.hanguyen.demo_spring_bai1.enums.Roles;
+import com.hanguyen.demo_spring_bai1.entity.*;
 import com.hanguyen.demo_spring_bai1.exception.BusinessException;
-import com.hanguyen.demo_spring_bai1.repository.LecturerRepository;
-import com.hanguyen.demo_spring_bai1.repository.StudentRepository;
-import com.hanguyen.demo_spring_bai1.repository.UserRepository;
+import com.hanguyen.demo_spring_bai1.exception.ResourceNotFoundException;
+import com.hanguyen.demo_spring_bai1.repository.*;
 import com.hanguyen.demo_spring_bai1.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +30,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final StudentRepository studentRepository;
     private final LecturerRepository lecturerRepository;
+    // --- BƯỚC 1: INJECT REPOSITORIES MỚI ---
+    private final MajorRepository majorRepository;
+    private final DepartmentRepository departmentRepository;
 
     public AuthResponse login(AuthRequest request) {
         try {
@@ -77,23 +76,40 @@ public class AuthService {
         user.getRoles().add(request.getRole());
         User savedUser = userRepository.save(user);
 
+        // --- BƯỚC 2, 3, 4, 5: SỬA LOGIC TRONG SWITCH-CASE ---
         switch (request.getRole()) {
             case STUDENT:
+                if (request.getMajorId() == null) {
+                    throw new BusinessException("Major ID is required for student registration.");
+                }
+                Major major = majorRepository.findById(request.getMajorId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Major", "id", request.getMajorId()));
+
                 Student studentProfile = Student.builder()
                         .user(savedUser)
                         .studentCode(request.getStudentCode())
                         .enrollmentYear(request.getEnrollmentYear())
+                        .major(major) // Gán đối tượng Major đã tìm được
                         .build();
                 studentRepository.save(studentProfile);
                 break;
+
             case LECTURER:
+                if (request.getDepartmentId() == null) {
+                    throw new BusinessException("Department ID is required for lecturer registration.");
+                }
+                Department department = departmentRepository.findById(request.getDepartmentId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Department", "id", request.getDepartmentId()));
+
                 Lecturer lecturerProfile = Lecturer.builder()
                         .user(savedUser)
                         .lecturerCode(request.getLecturerCode())
                         .degree(request.getDegree())
+                        .department(department) // Gán đối tượng Department đã tìm được
                         .build();
                 lecturerRepository.save(lecturerProfile);
                 break;
+
             case ADMIN:
                 break;
             default:
