@@ -21,7 +21,7 @@ public class LecturerController {
 
     private final LecturerService lecturerService;
 
-    @PreAuthorize("hasRole('LECTURER') and authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
+    @PreAuthorize("authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
     @GetMapping("/{lecturerId}/courses")
     public ApiResponse<List<Course>> getAssignedCourses(
             @PathVariable String lecturerId,
@@ -31,7 +31,7 @@ public class LecturerController {
         return ApiResponse.ok("Assigned courses fetched successfully", courses);
     }
 
-    @PreAuthorize("hasRole('LECTURER') and authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
+    @PreAuthorize("authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
     @GetMapping("/{lecturerId}/courses/{courseId}/students")
     public ApiResponse<List<StudentInCourseResponse>> getStudentList(
             @PathVariable String lecturerId,
@@ -41,7 +41,7 @@ public class LecturerController {
         return ApiResponse.ok("Student list fetched successfully", students);
     }
 
-    @PreAuthorize("hasRole('LECTURER') and authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
+    @PreAuthorize("authentication.name == @lecturerRepository.findById(#lecturerId).get().getUser().getUsername()")
     @PutMapping("/{lecturerId}/grades")
     public ApiResponse<Enrollment> updateGrade(
             @PathVariable String lecturerId,

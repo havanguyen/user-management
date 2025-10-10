@@ -25,8 +25,7 @@ public class StudentController {
         return ApiResponse.ok("Open courses fetched successfully", openCourses);
     }
 
-    // Áp dụng cho getMySchedule, registerCourse, dropCourse
-    @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
+    @PreAuthorize("authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     @GetMapping("/{studentId}/schedule")
     public ApiResponse<MyScheduleResponse> getMySchedule(
             @PathVariable String studentId,
@@ -36,7 +35,7 @@ public class StudentController {
         return ApiResponse.ok("Schedule fetched successfully", schedule);
     }
 
-    @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
+    @PreAuthorize("authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     @PostMapping("/{studentId}/enrollments")
     public ApiResponse<Enrollment> registerCourse(
             @PathVariable String studentId,
@@ -46,7 +45,7 @@ public class StudentController {
         return ApiResponse.created("Course registered successfully", enrollment);
     }
 
-    @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
+    @PreAuthorize("authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     @DeleteMapping("/{studentId}/enrollments/{enrollmentId}")
     public ApiResponse<Void> dropCourse(
             @PathVariable String studentId,
