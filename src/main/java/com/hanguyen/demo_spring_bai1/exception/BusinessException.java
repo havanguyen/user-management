@@ -1,25 +1,14 @@
 package com.hanguyen.demo_spring_bai1.exception;
 
+import com.hanguyen.demo_spring_bai1.enums.ErrorCode;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
-@ResponseStatus(HttpStatus.BAD_REQUEST)
 public class BusinessException extends RuntimeException {
+    private final ErrorCode errorCode;
 
-    public BusinessException(String message) {
-        super(message);
-    }
-
-    public BusinessException(String message, Throwable cause) {
-        super(message, cause);
-    }
-    private String errorCode;
-
-    public BusinessException(String errorCode, String message) {
-        super(message);
+    public BusinessException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
-
 }

@@ -4,6 +4,7 @@ import com.hanguyen.demo_spring_bai1.dto.request.accademic.GradeUpdateRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.StudentInCourseResponse;
 import com.hanguyen.demo_spring_bai1.entity.Course;
 import com.hanguyen.demo_spring_bai1.entity.Enrollment;
+import com.hanguyen.demo_spring_bai1.enums.ErrorCode;
 import com.hanguyen.demo_spring_bai1.exception.BusinessException;
 import com.hanguyen.demo_spring_bai1.exception.ResourceNotFoundException;
 import com.hanguyen.demo_spring_bai1.repository.CourseRepository;
@@ -38,7 +39,7 @@ public class LecturerService {
 
         // Xác thực giảng viên này có quyền xem lớp này không
         if (!course.getLecturer().getId().equals(lecturerId)) {
-            throw new BusinessException("You are not authorized to view this course's student list.");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_VIEW_COURSE_STUDENTS);
         }
 
         List<Enrollment> enrollments = enrollmentRepository.findAllByCourseId(courseId);
@@ -56,9 +57,9 @@ public class LecturerService {
         Enrollment enrollment = enrollmentRepository.findById(request.getEnrollmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment", "id", request.getEnrollmentId()));
 
-        // Xác thực giảng viên có quyền nhập điểm cho lớp này không
+
         if (!enrollment.getCourse().getLecturer().getId().equals(lecturerId)) {
-            throw new BusinessException("You are not authorized to update grades for this course.");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_UPDATE_GRADE);
         }
 
         enrollment.setGrade(request.getGrade());

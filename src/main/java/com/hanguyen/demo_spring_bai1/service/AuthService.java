@@ -5,6 +5,7 @@ import com.hanguyen.demo_spring_bai1.dto.request.RefreshTokenRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.RegisterRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.AuthResponse;
 import com.hanguyen.demo_spring_bai1.entity.*;
+import com.hanguyen.demo_spring_bai1.enums.ErrorCode;
 import com.hanguyen.demo_spring_bai1.exception.BusinessException;
 import com.hanguyen.demo_spring_bai1.exception.ResourceNotFoundException;
 import com.hanguyen.demo_spring_bai1.repository.*;
@@ -43,7 +44,7 @@ public class AuthService {
                             request.getUsername(), request.getPassword()));
 
             User user = userRepository.findByUsername(request.getUsername())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
             String accessToken = jwtTokenProvider.generateToken(user.getUsername(), user.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));
 
@@ -58,13 +59,13 @@ public class AuthService {
                     .build();
 
         } catch (AuthenticationException e) {
-            throw new RuntimeException("Invalid username or password");
+            throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
         }
     }
 
     public AuthResponse refreshToken(RefreshTokenRequest request) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getToken())
-                .orElseThrow(() -> new BusinessException("Refresh token not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         refreshTokenService.verifyExpiration(refreshToken);
 
@@ -83,14 +84,14 @@ public class AuthService {
     @Transactional
     public void logout(RefreshTokenRequest request) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getToken())
-                .orElseThrow(() -> new BusinessException("Refresh token not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
         refreshTokenRepository.delete(refreshToken);
     }
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new BusinessException("Username already exists");
+            throw new BusinessException(ErrorCode.USER_EXISTED);
         }
 
         User user = User.builder()
@@ -108,7 +109,7 @@ public class AuthService {
         switch (request.getRole()) {
             case STUDENT:
                 if (request.getMajorId() == null) {
-                    throw new BusinessException("Major ID is required for student registration.");
+                    throw new BusinessException(ErrorCode.MAJOR_ID_REQUIRED);
                 }
                 Major major = majorRepository.findById(request.getMajorId())
                         .orElseThrow(() -> new ResourceNotFoundException("Major", "id", request.getMajorId()));
@@ -124,7 +125,7 @@ public class AuthService {
 
             case LECTURER:
                 if (request.getDepartmentId() == null) {
-                    throw new BusinessException("Department ID is required for lecturer registration.");
+                    throw new BusinessException(ErrorCode.DEPARTMENT_ID_REQUIRED);
                 }
                 Department department = departmentRepository.findById(request.getDepartmentId())
                         .orElseThrow(() -> new ResourceNotFoundException("Department", "id", request.getDepartmentId()));
@@ -141,7 +142,7 @@ public class AuthService {
             case ADMIN:
                 break;
             default:
-                throw new BusinessException("Invalid role for registration.");
+                throw new BusinessException(ErrorCode.INVALID_ROLE);
         }
 
         String accessToken = jwtTokenProvider.generateToken(savedUser.getUsername(), savedUser.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));

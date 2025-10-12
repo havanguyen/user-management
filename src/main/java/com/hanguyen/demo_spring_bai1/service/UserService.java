@@ -4,7 +4,9 @@ import com.hanguyen.demo_spring_bai1.dto.request.UserCreationRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.UserUpdateRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.UserResponse;
 import com.hanguyen.demo_spring_bai1.entity.User;
+import com.hanguyen.demo_spring_bai1.enums.ErrorCode;
 import com.hanguyen.demo_spring_bai1.enums.Roles;
+import com.hanguyen.demo_spring_bai1.exception.BusinessException;
 import com.hanguyen.demo_spring_bai1.mapper.UserMapper;
 import com.hanguyen.demo_spring_bai1.repository.UserRepository;
 import lombok.AccessLevel;
@@ -27,15 +29,14 @@ public class UserService {
 
     public User createUser(UserCreationRequest request){
         if(userRepository.existsByUsername(request.getUsername())){
-            throw  new RuntimeException("User existed");
+            throw  new BusinessException(ErrorCode.USER_EXISTED);
         }
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        // --- SỬA LỖI Ở ĐÂY ---
-        Set<Roles> roles = new HashSet<>(); // Đổi từ HashSet<String> sang Set<Roles>
-        roles.add(Roles.USER); // Thêm trực tiếp Enum, không cần .name()
-        // ---------------------
+
+        Set<Roles> roles = new HashSet<>();
+        roles.add(Roles.USER);
 
         user.setRoles(roles);
         return  userRepository.save(user) ;
@@ -47,13 +48,13 @@ public class UserService {
 
     public UserResponse getUser (String id){
         return userMapper.toUserResponse(userRepository.findById(id).
-                orElseThrow(() -> new RuntimeException("User not found")));
+                orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND)));
     }
 
     public UserResponse updateUser (String id , UserUpdateRequest request){
 
         User user = userRepository.findById(id).
-                orElseThrow(() -> new RuntimeException("User not found"));
+                orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         userMapper.updateUser(user , request);
 

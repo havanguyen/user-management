@@ -3,6 +3,7 @@ package com.hanguyen.demo_spring_bai1.service;
 import com.hanguyen.demo_spring_bai1.dto.response.MyScheduleResponse;
 import com.hanguyen.demo_spring_bai1.entity.*;
 import com.hanguyen.demo_spring_bai1.enums.EnrollmentStatus;
+import com.hanguyen.demo_spring_bai1.enums.ErrorCode;
 import com.hanguyen.demo_spring_bai1.exception.BusinessException;
 import com.hanguyen.demo_spring_bai1.exception.ResourceNotFoundException;
 import com.hanguyen.demo_spring_bai1.exception.registration.AlreadyEnrolledException;
@@ -32,7 +33,7 @@ public class StudentService {
 
     public List<Course> getOpenCoursesForRegistration() {
         RegistrationPeriod activePeriod = registrationPeriodRepository.findByIsActiveTrue()
-                .orElseThrow(() -> new BusinessException("Registration is not open at the moment."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.REGISTRATION_NOT_OPEN));
         String semesterId = activePeriod.getSemester().getId();
         return courseRepository.findBySemesterId(semesterId);
     }
@@ -67,7 +68,7 @@ public class StudentService {
     @Transactional
     public Enrollment registerCourse(String studentId, String courseId) {
         RegistrationPeriod activePeriod = registrationPeriodRepository.findByIsActiveTrue()
-                .orElseThrow(() -> new BusinessException("Registration is not open."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.REGISTRATION_NOT_OPEN));
 
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
@@ -75,7 +76,7 @@ public class StudentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
 
         if (!course.getSemester().getId().equals(activePeriod.getSemester().getId())) {
-            throw new BusinessException("This course is not in the active registration period.");
+            throw new BusinessException(ErrorCode.COURSE_NOT_IN_ACTIVE_PERIOD);
         }
 
         if (course.getCurrentStudents() >= course.getMaxStudents()) {
@@ -107,13 +108,13 @@ public class StudentService {
     @Transactional
     public void dropCourse(String studentId, String enrollmentId) {
         registrationPeriodRepository.findByIsActiveTrue()
-                .orElseThrow(() -> new BusinessException("Registration is not open."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.REGISTRATION_NOT_OPEN));
 
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment", "id", enrollmentId));
 
         if (!enrollment.getStudent().getId().equals(studentId)) {
-            throw new BusinessException("You are not authorized to drop this course.");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_DROP_COURSE);
         }
 
         Course course = enrollment.getCourse();

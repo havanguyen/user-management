@@ -3,6 +3,7 @@ package com.hanguyen.demo_spring_bai1.service.accademic;
 import com.hanguyen.demo_spring_bai1.dto.request.accademic.RegistrationPeriodRequest;
 import com.hanguyen.demo_spring_bai1.entity.RegistrationPeriod;
 import com.hanguyen.demo_spring_bai1.entity.Semester;
+import com.hanguyen.demo_spring_bai1.enums.ErrorCode;
 import com.hanguyen.demo_spring_bai1.exception.BusinessException;
 import com.hanguyen.demo_spring_bai1.exception.ResourceNotFoundException;
 import com.hanguyen.demo_spring_bai1.repository.RegistrationPeriodRepository;
@@ -42,7 +43,7 @@ public class RegistrationPeriodService {
         if (isActive) {
             Optional<RegistrationPeriod> currentActivePeriod = registrationPeriodRepository.findByIsActiveTrue();
             if (currentActivePeriod.isPresent() && !currentActivePeriod.get().getId().equals(periodId)) {
-                throw new BusinessException("Another registration period is already active. Please deactivate it first.");
+                throw new BusinessException(ErrorCode.ANOTHER_PERIOD_ACTIVE);
             }
         }
 
