@@ -6,6 +6,7 @@ import com.hanguyen.demo_spring_bai1.dto.request.RefreshTokenRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.RegisterRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.AuthResponse;
 import com.hanguyen.demo_spring_bai1.service.AuthService;
+import com.hanguyen.demo_spring_bai1.service.RegistrationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     AuthService authService;
+    RegistrationService registrationService;
 
     @PostMapping("/login")
     public ApiResponse<AuthResponse> login(@RequestBody AuthRequest request) {
@@ -27,7 +29,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ApiResponse<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponse response = authService.register(request);
+        AuthResponse response = registrationService.registerUser(request);
         return ApiResponse.created("User registered successfully", response);
     }
 

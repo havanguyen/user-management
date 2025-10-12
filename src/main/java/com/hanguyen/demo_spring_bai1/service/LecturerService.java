@@ -26,7 +26,6 @@ public class LecturerService {
     private final LecturerRepository lecturerRepository;
 
     public List<Course> getAssignedCourses(String lecturerId, String semesterId) {
-        // Kiểm tra giảng viên tồn tại
         if (!lecturerRepository.existsById(lecturerId)) {
             throw new ResourceNotFoundException("Lecturer", "id", lecturerId);
         }
@@ -37,7 +36,7 @@ public class LecturerService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
 
-        // Xác thực giảng viên này có quyền xem lớp này không
+
         if (!course.getLecturer().getId().equals(lecturerId)) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED_VIEW_COURSE_STUDENTS);
         }

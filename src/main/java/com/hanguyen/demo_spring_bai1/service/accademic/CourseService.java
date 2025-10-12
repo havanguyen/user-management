@@ -6,8 +6,7 @@ import com.hanguyen.demo_spring_bai1.entity.Course;
 import com.hanguyen.demo_spring_bai1.entity.Lecturer;
 import com.hanguyen.demo_spring_bai1.entity.Semester;
 import com.hanguyen.demo_spring_bai1.entity.Subject;
-import com.hanguyen.demo_spring_bai1.enums.CourseStatus; // Cần tạo enum này
-import com.hanguyen.demo_spring_bai1.exception.BusinessException;
+import com.hanguyen.demo_spring_bai1.enums.CourseStatus;
 import com.hanguyen.demo_spring_bai1.exception.ResourceNotFoundException;
 import com.hanguyen.demo_spring_bai1.repository.CourseRepository;
 import com.hanguyen.demo_spring_bai1.repository.LecturerRepository;
@@ -27,12 +26,10 @@ public class CourseService {
     private final SubjectRepository subjectRepository;
     private final SemesterRepository semesterRepository;
     private final LecturerRepository lecturerRepository;
-    // private final CourseMapper courseMapper; // Sẽ thêm mapper sau
 
     public Course createCourse(CourseRequest request) {
         log.info("Creating course with code: {}", request.getCourseCode());
 
-        // 1. Kiểm tra sự tồn tại của các thực thể liên quan
         Subject subject = subjectRepository.findById(request.getSubjectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject", "id", request.getSubjectId()));
 

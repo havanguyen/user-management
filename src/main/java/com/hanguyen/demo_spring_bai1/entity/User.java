@@ -1,11 +1,12 @@
 package com.hanguyen.demo_spring_bai1.entity;
 
-import com.hanguyen.demo_spring_bai1.enums.Roles; // Import Enum
+import com.hanguyen.demo_spring_bai1.enums.Roles;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -28,4 +29,20 @@ public class User {
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     Set<Roles> roles;
+
+
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
 }

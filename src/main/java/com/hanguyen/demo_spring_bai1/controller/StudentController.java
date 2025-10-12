@@ -4,8 +4,11 @@ import com.hanguyen.demo_spring_bai1.dto.request.ApiResponse;
 import com.hanguyen.demo_spring_bai1.dto.response.MyScheduleResponse;
 import com.hanguyen.demo_spring_bai1.entity.Course;
 import com.hanguyen.demo_spring_bai1.entity.Enrollment;
+import com.hanguyen.demo_spring_bai1.service.RegistrationCommandService;
 import com.hanguyen.demo_spring_bai1.service.StudentService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +17,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/student")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
 public class StudentController {
 
-    private final StudentService studentService;
+      StudentService studentService;
+      RegistrationCommandService registrationCommandService;
 
     @GetMapping("/courses/open-for-registration")
     @PreAuthorize("hasRole('STUDENT')")
@@ -41,7 +46,7 @@ public class StudentController {
             @PathVariable String studentId,
             @RequestParam String courseId
     ) {
-        Enrollment enrollment = studentService.registerCourse(studentId, courseId);
+        Enrollment enrollment = registrationCommandService.registerCourse(studentId, courseId);
         return ApiResponse.created("Course registered successfully", enrollment);
     }
 
@@ -51,7 +56,7 @@ public class StudentController {
             @PathVariable String studentId,
             @PathVariable String enrollmentId
     ) {
-        studentService.dropCourse(studentId, enrollmentId);
+        registrationCommandService.dropCourse(studentId, enrollmentId);
         return ApiResponse.ok("Course dropped successfully", null);
     }
 }

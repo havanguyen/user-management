@@ -29,13 +29,8 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final StudentRepository studentRepository;
-    private final LecturerRepository lecturerRepository;
-    private final MajorRepository majorRepository;
-    private final DepartmentRepository departmentRepository;
-    private final RefreshTokenService refreshTokenService; // Đã thêm
-    private final RefreshTokenRepository refreshTokenRepository; // Đã thêm
+    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public AuthResponse login(AuthRequest request) {
         try {
@@ -86,73 +81,5 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getToken())
                 .orElseThrow(() -> new BusinessException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
         refreshTokenRepository.delete(refreshToken);
-    }
-
-    @Transactional
-    public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new BusinessException(ErrorCode.USER_EXISTED);
-        }
-
-        User user = User.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .dod(request.getDod())
-                .roles(new HashSet<>())
-                .build();
-
-        user.getRoles().add(request.getRole());
-        User savedUser = userRepository.save(user);
-
-        switch (request.getRole()) {
-            case STUDENT:
-                if (request.getMajorId() == null) {
-                    throw new BusinessException(ErrorCode.MAJOR_ID_REQUIRED);
-                }
-                Major major = majorRepository.findById(request.getMajorId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Major", "id", request.getMajorId()));
-
-                Student studentProfile = Student.builder()
-                        .user(savedUser)
-                        .studentCode(request.getStudentCode())
-                        .enrollmentYear(request.getEnrollmentYear())
-                        .major(major)
-                        .build();
-                studentRepository.save(studentProfile);
-                break;
-
-            case LECTURER:
-                if (request.getDepartmentId() == null) {
-                    throw new BusinessException(ErrorCode.DEPARTMENT_ID_REQUIRED);
-                }
-                Department department = departmentRepository.findById(request.getDepartmentId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Department", "id", request.getDepartmentId()));
-
-                Lecturer lecturerProfile = Lecturer.builder()
-                        .user(savedUser)
-                        .lecturerCode(request.getLecturerCode())
-                        .degree(request.getDegree())
-                        .department(department)
-                        .build();
-                lecturerRepository.save(lecturerProfile);
-                break;
-
-            case ADMIN:
-                break;
-            default:
-                throw new BusinessException(ErrorCode.INVALID_ROLE);
-        }
-
-        String accessToken = jwtTokenProvider.generateToken(savedUser.getUsername(), savedUser.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser.getUsername());
-
-        return AuthResponse.builder()
-                .authenticated(true)
-                .access_token(accessToken)
-                .refresh_token(refreshToken.getToken())
-                .user(savedUser)
-                .build();
     }
 }

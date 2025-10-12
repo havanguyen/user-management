@@ -5,7 +5,6 @@ import io.jsonwebtoken.security.Keys;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -15,45 +14,35 @@ import java.util.StringJoiner;
 
 @Slf4j
 @Component
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret-key}")
-    private String jwtSecret;
-
-    @Value("${jwt.access-token-validity:3600000}")
-    private long accessTokenValidity;
-
-    @Value("${jwt.refresh-token-validity:604800000}")
-    private long refreshTokenValidity;
+    JwtProperties jwtProperties;
 
     private SecretKey getSigningKey() {
         try {
-            return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+            return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes());
         } catch (Exception e) {
             log.error("Error creating signing key", e);
-            throw new RuntimeException("JWT configuration error");
+            throw new RuntimeException("JWT configuration error", e);
         }
     }
 
-    public String generateToken(String username , Set<String> roles ) {
-        return generateTokenWithExpiration(username, roles , accessTokenValidity);
+    public String generateToken(String username, Set<String> roles) {
+        return generateTokenWithExpiration(username, roles, jwtProperties.getAccessTokenValidity());
     }
 
-    public String generateRefreshToken(String username ,Set<String> roles ) {
-        return generateTokenWithExpiration(username,roles , refreshTokenValidity);
+    public String generateRefreshToken(String username, Set<String> roles) {
+        return generateTokenWithExpiration(username, roles, jwtProperties.getRefreshTokenValidity());
     }
 
-    private String generateTokenWithExpiration(String username, Set<String> roles , long validity) {
+    private String generateTokenWithExpiration(String username, Set<String> roles, long validity) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + validity);
 
         return Jwts.builder()
-                .claim("scope" , buildScope(roles))
+                .claim("scope", buildScope(roles))
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
@@ -74,7 +63,7 @@ public class JwtTokenProvider {
             throw e;
         } catch (JwtException e) {
             log.error("JWT token validation error: {}", e.getMessage());
-            throw new RuntimeException("Invalid JWT token");
+            throw new RuntimeException("Invalid JWT token", e);
         }
     }
 
@@ -91,11 +80,9 @@ public class JwtTokenProvider {
         }
     }
 
-    private String buildScope(Set<String> roles){
+    private String buildScope(Set<String> roles) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!roles.isEmpty()){
-            roles.forEach(stringJoiner::add);
-        }
-        return  stringJoiner.toString();
+        roles.forEach(stringJoiner::add);
+        return stringJoiner.toString();
     }
 }
