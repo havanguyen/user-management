@@ -4,6 +4,21 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+@NamedEntityGraph(
+        name = "student-with-details",
+        attributeNodes = {
+                @NamedAttributeNode("user"),
+                @NamedAttributeNode(value = "major", subgraph = "major-with-department")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "major-with-department",
+                        attributeNodes = {
+                                @NamedAttributeNode("department")
+                        }
+                )
+        }
+)
 @Entity
 @Getter
 @Setter
@@ -21,11 +36,11 @@ public class Student {
 
     int enrollmentYear;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "major_id")
     Major major;
 }

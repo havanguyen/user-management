@@ -9,6 +9,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+@NamedEntityGraph(
+        name = "user-with-roles",
+        attributeNodes = {
+                @NamedAttributeNode("roles")  // Fetch collection roles
+        }
+)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @NoArgsConstructor
@@ -30,10 +36,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     Set<Roles> roles;
 
-
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-
 
     @PrePersist
     protected void onCreate() {
@@ -44,5 +48,4 @@ public class User {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
 }

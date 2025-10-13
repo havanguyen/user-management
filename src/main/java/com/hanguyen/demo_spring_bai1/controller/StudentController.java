@@ -1,6 +1,7 @@
 package com.hanguyen.demo_spring_bai1.controller;
 
 import com.hanguyen.demo_spring_bai1.dto.request.ApiResponse;
+import com.hanguyen.demo_spring_bai1.dto.response.CourseResponse;
 import com.hanguyen.demo_spring_bai1.dto.response.MyScheduleResponse;
 import com.hanguyen.demo_spring_bai1.entity.Course;
 import com.hanguyen.demo_spring_bai1.entity.Enrollment;
@@ -25,8 +26,8 @@ public class StudentController {
 
     @GetMapping("/courses/open-for-registration")
     @PreAuthorize("hasRole('STUDENT')")
-    public ApiResponse<List<Course>> getOpenCourses() {
-        List<Course> openCourses = studentService.getOpenCoursesForRegistration();
+    public ApiResponse<List<CourseResponse>> getOpenCourses() {
+        List<CourseResponse> openCourses = studentService.getOpenCoursesForRegistration();
         return ApiResponse.ok("Open courses fetched successfully", openCourses);
     }
 

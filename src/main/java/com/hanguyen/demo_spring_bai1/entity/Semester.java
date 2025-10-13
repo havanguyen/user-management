@@ -1,14 +1,14 @@
 package com.hanguyen.demo_spring_bai1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
+@NamedEntityGraph(
+        name = "semester-basic"  // Graph cơ bản
+)
 @Entity
 @Getter
 @Setter

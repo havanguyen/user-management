@@ -6,6 +6,13 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.Set;
 
+@NamedEntityGraph(
+        name = "subject-with-details",
+        attributeNodes = {
+                @NamedAttributeNode("department"),
+                @NamedAttributeNode("prerequisites")  // Fetch ManyToMany
+        }
+)
 @Entity
 @Getter
 @Setter
@@ -24,11 +31,11 @@ public class Subject {
     String name;
     int credits;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     Department department;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "prerequisite",
             joinColumns = @JoinColumn(name = "subject_id"),

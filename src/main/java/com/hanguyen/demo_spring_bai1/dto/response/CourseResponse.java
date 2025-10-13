@@ -1,8 +1,6 @@
 package com.hanguyen.demo_spring_bai1.dto.response;
 
-import com.hanguyen.demo_spring_bai1.entity.Lecturer;
-import com.hanguyen.demo_spring_bai1.entity.Semester;
-import com.hanguyen.demo_spring_bai1.entity.Subject;
+import com.hanguyen.demo_spring_bai1.enums.CourseStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -17,9 +15,35 @@ public class CourseResponse {
     int maxStudents;
     int currentStudents;
     String scheduleInfo;
-    String status;
+    CourseStatus status;
+    SubjectResponse subject;
+    SemesterResponse semester;
+    LecturerResponse lecturer;
 
-    Subject subject;
-    Semester semester;
-    UserResponse lecturer;
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class SubjectResponse {
+        String subjectCode;
+        String name;
+        int credits;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class SemesterResponse {
+        String name;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class LecturerResponse {
+        String fullName;
+        String degree;
+    }
 }

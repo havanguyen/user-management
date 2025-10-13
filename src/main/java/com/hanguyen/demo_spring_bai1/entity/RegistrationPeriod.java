@@ -6,6 +6,12 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
+@NamedEntityGraph(
+        name = "registrationPeriod-with-details",
+        attributeNodes = {
+                @NamedAttributeNode("semester")
+        }
+)
 @Entity
 @Getter
 @Setter
@@ -22,7 +28,7 @@ public class RegistrationPeriod {
     LocalDateTime endTime;
     boolean isActive;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "semester_id", unique = true)
-            Semester semester;
+    Semester semester;
 }

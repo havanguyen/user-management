@@ -4,6 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+@NamedEntityGraph(
+        name = "lecturer-with-details",
+        attributeNodes = {
+                @NamedAttributeNode("user"),
+                @NamedAttributeNode("department")
+        }
+)
 @Entity
 @Getter
 @Setter
@@ -21,12 +28,11 @@ public class Lecturer {
 
     String degree;
 
-
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     Department department;
 }
