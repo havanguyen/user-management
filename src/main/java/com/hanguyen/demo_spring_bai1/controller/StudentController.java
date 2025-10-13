@@ -10,6 +10,7 @@ import com.hanguyen.demo_spring_bai1.service.StudentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +27,13 @@ public class StudentController {
 
     @GetMapping("/courses/open-for-registration")
     @PreAuthorize("hasRole('STUDENT')")
-    public ApiResponse<List<CourseResponse>> getOpenCourses() {
-        List<CourseResponse> openCourses = studentService.getOpenCoursesForRegistration();
+    public ApiResponse<Page<CourseResponse>> getOpenCourses(
+            @RequestParam(defaultValue = "0") int page ,
+            @RequestParam(defaultValue = "5") int size ,
+            @RequestParam(defaultValue = "courseCode") String orderBy ,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        Page<CourseResponse> openCourses = studentService.getOpenCoursesForRegistration(page , size , orderBy , direction);
         return ApiResponse.ok("Open courses fetched successfully", openCourses);
     }
 

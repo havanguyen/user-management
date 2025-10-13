@@ -14,6 +14,10 @@ import com.hanguyen.demo_spring_bai1.repository.SemesterRepository;
 import com.hanguyen.demo_spring_bai1.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,11 +62,13 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
-    public List<Course> getCoursesBySemester(String semesterId) {
+    public Page<Course> getCoursesBySemester(String semesterId , int  page , int size , String sortBy) {
         if (!semesterRepository.existsById(semesterId)) {
             throw new ResourceNotFoundException("Semester", "id", semesterId);
         }
-        return courseRepository.findBySemesterId(semesterId);
+
+        Pageable pageable = PageRequest.of(page , size , Sort.by(sortBy).ascending());
+        return courseRepository.findBySemesterId(semesterId , pageable);
     }
 
     public Course getCourseById(String courseId) {

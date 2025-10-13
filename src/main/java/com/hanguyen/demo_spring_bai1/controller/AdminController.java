@@ -15,6 +15,7 @@ import com.hanguyen.demo_spring_bai1.service.accademic.SemesterService;
 import com.hanguyen.demo_spring_bai1.service.accademic.SubjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -78,8 +79,13 @@ public class AdminController {
     }
 
     @GetMapping("/semesters/{semesterId}/courses")
-    public ApiResponse<List<Course>> getCoursesBySemester(@PathVariable String semesterId) {
-        return ApiResponse.ok(courseService.getCoursesBySemester(semesterId));
+    public ApiResponse<Page<Course>> getCoursesBySemester(
+            @PathVariable String semesterId ,
+            @RequestParam(defaultValue = "0") int page ,
+            @RequestParam(defaultValue = "5") int size ,
+            @RequestParam(defaultValue = "courseCode") String sortBy
+            ) {
+        return ApiResponse.ok(courseService.getCoursesBySemester(semesterId , page , size , sortBy));
     }
 
     @PostMapping("/registration-periods")

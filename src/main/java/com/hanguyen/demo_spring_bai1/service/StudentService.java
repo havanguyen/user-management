@@ -6,14 +6,18 @@ import com.hanguyen.demo_spring_bai1.entity.*;
 import com.hanguyen.demo_spring_bai1.enums.ErrorCode;
 import com.hanguyen.demo_spring_bai1.exception.BusinessException;
 import com.hanguyen.demo_spring_bai1.exception.ResourceNotFoundException;
-import com.hanguyen.demo_spring_bai1.mapper.CourseMapper; // Import mapper
+import com.hanguyen.demo_spring_bai1.mapper.CourseMapper;
 import com.hanguyen.demo_spring_bai1.repository.CourseRepository;
 import com.hanguyen.demo_spring_bai1.repository.EnrollmentRepository;
 import com.hanguyen.demo_spring_bai1.repository.RegistrationPeriodRepository;
 import com.hanguyen.demo_spring_bai1.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Import transactional
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,19 +32,21 @@ public class StudentService {
     private final EnrollmentRepository enrollmentRepository;
     private final CourseMapper courseMapper; // Inject mapper
 
-    @Transactional(readOnly = true) // Thêm Transactional để giữ session
-    public List<CourseResponse> getOpenCoursesForRegistration() {
+    @Transactional(readOnly = true)
+    public Page<CourseResponse> getOpenCoursesForRegistration(int page , int size , String sortBy , String direction) {
         RegistrationPeriod activePeriod = registrationPeriodRepository.findByIsActiveTrue()
                 .orElseThrow(() -> new BusinessException(ErrorCode.REGISTRATION_NOT_OPEN));
         String semesterId = activePeriod.getSemester().getId();
 
-        // Sử dụng phương thức với @EntityGraph
-        List<Course> courses = courseRepository.findAllBySemesterId(semesterId);
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
 
-        // Map sang DTO
-        return courses.stream()
-                .map(courseMapper::toCourseResponse)
-                .collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(page , size , sort);
+
+        Page<Course> courses = courseRepository.findBySemesterId(semesterId , pageable);
+
+        return courses.map(courseMapper::toCourseResponse);
     }
 
     public MyScheduleResponse getMySchedule(String studentId, String semesterId) {
