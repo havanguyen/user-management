@@ -1,8 +1,8 @@
 package com.hanguyen.demo_spring_bai1.controller;
 
-import com.hanguyen.demo_spring_bai1.dto.request.ApiResponse;
 import com.hanguyen.demo_spring_bai1.dto.request.UserCreationRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.UserUpdateRequest;
+import com.hanguyen.demo_spring_bai1.dto.response.ApiResponse;
 import com.hanguyen.demo_spring_bai1.dto.response.UserResponse;
 import com.hanguyen.demo_spring_bai1.entity.User;
 import com.hanguyen.demo_spring_bai1.service.UserService;
@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
 
     UserService userService;
@@ -30,28 +30,29 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public ApiResponse<List<User>> getAllUsers() {
 
-       var auth = SecurityContextHolder.getContext().getAuthentication();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-
-        return userService.getAllUser();
+        return ApiResponse.ok("Get all users successfully", userService.getAllUser());
     }
 
     @GetMapping("/{userId}")
-    public UserResponse getUser(@PathVariable String userId) {
-        return userService.getUser(userId);
+    public ApiResponse<UserResponse> getUser(@PathVariable String userId) {
+        return ApiResponse.ok("Get user successfully", userService.getUser(userId));
     }
 
     @PutMapping("/{userId}")
-    public UserResponse updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
-        return userService.updateUser(userId, request);
+    public ApiResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+        return ApiResponse.ok("User updated successfully", userService.updateUser(userId, request));
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable String userId) {
+    public ApiResponse<Void> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
+        return ApiResponse.ok("User deleted successfully", null);
     }
+
     @GetMapping("/explicit")
     public ApiResponse<List<User>> getUsersExplicit() {
         List<User> users = userService.getAllUser();

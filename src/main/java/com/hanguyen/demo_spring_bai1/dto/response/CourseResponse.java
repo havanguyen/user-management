@@ -1,6 +1,6 @@
 package com.hanguyen.demo_spring_bai1.dto.response;
 
-import com.hanguyen.demo_spring_bai1.enums.CourseStatus;
+import com.hanguyen.demo_spring_bai1.constant.CourseStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

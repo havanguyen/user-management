@@ -1,6 +1,6 @@
 package com.hanguyen.demo_spring_bai1.entity;
 
-import com.hanguyen.demo_spring_bai1.enums.Roles;
+import com.hanguyen.demo_spring_bai1.constant.Roles;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

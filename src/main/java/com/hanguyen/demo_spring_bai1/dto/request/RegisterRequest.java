@@ -1,6 +1,6 @@
 package com.hanguyen.demo_spring_bai1.dto.request;
 
-import com.hanguyen.demo_spring_bai1.enums.Roles;
+import com.hanguyen.demo_spring_bai1.constant.Roles;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

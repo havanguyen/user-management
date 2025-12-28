@@ -1,6 +1,6 @@
 package com.hanguyen.demo_spring_bai1.entity;
 
-import com.hanguyen.demo_spring_bai1.enums.CourseStatus;
+import com.hanguyen.demo_spring_bai1.constant.CourseStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

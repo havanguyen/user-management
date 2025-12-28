@@ -2,10 +2,10 @@ package com.hanguyen.demo_spring_bai1.service;
 
 import com.hanguyen.demo_spring_bai1.entity.RefreshToken;
 import com.hanguyen.demo_spring_bai1.entity.User;
-import com.hanguyen.demo_spring_bai1.enums.ErrorCode;
-import com.hanguyen.demo_spring_bai1.exception.BusinessException;
+import com.hanguyen.demo_spring_bai1.constant.ErrorCode;
 import com.hanguyen.demo_spring_bai1.repository.RefreshTokenRepository;
 import com.hanguyen.demo_spring_bai1.repository.UserRepository;
+import com.hanguyen.demo_spring_bai1.exception.AppException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +28,7 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken createRefreshToken(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         RefreshToken newRefreshToken = RefreshToken.builder()
                 .user(user)
@@ -41,7 +41,7 @@ public class RefreshTokenService {
     public void verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);
-            throw new BusinessException(ErrorCode.REFRESH_TOKEN_EXPIRED);
+            throw new AppException(ErrorCode.REFRESH_TOKEN_EXPIRED);
         }
     }
 

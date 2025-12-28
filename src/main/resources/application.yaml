@@ -1,17 +1,35 @@
 server:
   port: 8080
   servlet:
-    context-path: /identity
+    context-path: /api
 
 spring:
   datasource:
-    url: "jdbc:mysql://localhost:3306/spring"
+    url: "jdbc:mysql://localhost:3306/dktc_db"
     username: root
     password: root
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+  flyway:
+    enabled: false
+    baseline-on-migrate: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 jwt:
   secret-key: "mFIbgAHanwWv+qk8D8sVzvA+gte2ZNUgHQCNDKn0KhA="

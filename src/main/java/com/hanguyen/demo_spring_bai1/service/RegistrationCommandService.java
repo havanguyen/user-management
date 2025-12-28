@@ -1,14 +1,9 @@
 package com.hanguyen.demo_spring_bai1.service;
 
-
 import com.hanguyen.demo_spring_bai1.entity.*;
-import com.hanguyen.demo_spring_bai1.enums.EnrollmentStatus;
-import com.hanguyen.demo_spring_bai1.enums.ErrorCode;
-import com.hanguyen.demo_spring_bai1.exception.BusinessException;
-import com.hanguyen.demo_spring_bai1.exception.ResourceNotFoundException;
-import com.hanguyen.demo_spring_bai1.exception.registration.AlreadyEnrolledException;
-import com.hanguyen.demo_spring_bai1.exception.registration.CourseFullException;
-import com.hanguyen.demo_spring_bai1.exception.registration.PrerequisiteNotMetException;
+import com.hanguyen.demo_spring_bai1.constant.EnrollmentStatus;
+import com.hanguyen.demo_spring_bai1.constant.ErrorCode;
+import com.hanguyen.demo_spring_bai1.exception.AppException;
 import com.hanguyen.demo_spring_bai1.repository.CourseRepository;
 import com.hanguyen.demo_spring_bai1.repository.EnrollmentRepository;
 import com.hanguyen.demo_spring_bai1.repository.RegistrationPeriodRepository;
@@ -25,38 +20,36 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RegistrationCommandService {
 
-      CourseRepository courseRepository;
-      RegistrationPeriodRepository registrationPeriodRepository;
-      StudentRepository studentRepository;
-      EnrollmentRepository enrollmentRepository;
-
+    CourseRepository courseRepository;
+    RegistrationPeriodRepository registrationPeriodRepository;
+    StudentRepository studentRepository;
+    EnrollmentRepository enrollmentRepository;
 
     @Transactional
     public Enrollment registerCourse(String studentId, String courseId) {
         RegistrationPeriod activePeriod = registrationPeriodRepository.findByIsActiveTrue()
-                .orElseThrow(() -> new BusinessException(ErrorCode.REGISTRATION_NOT_OPEN));
+                .orElseThrow(() -> new AppException(ErrorCode.REGISTRATION_NOT_OPEN));
 
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!course.getSemester().getId().equals(activePeriod.getSemester().getId())) {
-            throw new BusinessException(ErrorCode.COURSE_NOT_IN_ACTIVE_PERIOD);
+            throw new AppException(ErrorCode.COURSE_NOT_IN_ACTIVE_PERIOD);
         }
 
         if (course.getCurrentStudents() >= course.getMaxStudents()) {
-            throw new CourseFullException(course.getCourseCode());
+            throw new AppException(ErrorCode.COURSE_FULL);
         }
 
         boolean alreadyEnrolled = enrollmentRepository.existsByStudentIdAndCourseSemesterIdAndCourseSubjectId(
-                studentId, course.getSemester().getId(), course.getSubject().getId()
-        );
+                studentId, course.getSemester().getId(), course.getSubject().getId());
         if (alreadyEnrolled) {
-            throw new AlreadyEnrolledException(course.getSubject().getName());
+            throw new AppException(ErrorCode.ALREADY_ENROLLED);
         }
 
         checkPrerequisites(student, course.getSubject());
@@ -77,13 +70,13 @@ public class RegistrationCommandService {
     @Transactional
     public void dropCourse(String studentId, String enrollmentId) {
         registrationPeriodRepository.findByIsActiveTrue()
-                .orElseThrow(() -> new BusinessException(ErrorCode.REGISTRATION_NOT_OPEN));
+                .orElseThrow(() -> new AppException(ErrorCode.REGISTRATION_NOT_OPEN));
 
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Enrollment", "id", enrollmentId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!enrollment.getStudent().getId().equals(studentId)) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED_DROP_COURSE);
+            throw new AppException(ErrorCode.UNAUTHORIZED_DROP_COURSE);
         }
 
         Course course = enrollment.getCourse();
@@ -106,7 +99,7 @@ public class RegistrationCommandService {
 
         for (Subject prereq : prerequisites) {
             if (!passedSubjectIds.contains(prereq.getId())) {
-                throw new PrerequisiteNotMetException("Prerequisite not met: You must pass " + prereq.getName());
+                throw new AppException(ErrorCode.PREREQUISITE_NOT_MET);
             }
         }
     }

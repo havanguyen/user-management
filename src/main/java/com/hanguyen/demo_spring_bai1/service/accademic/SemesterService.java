@@ -1,10 +1,10 @@
 package com.hanguyen.demo_spring_bai1.service.accademic;
 
-
 import com.hanguyen.demo_spring_bai1.dto.request.accademic.SemesterRequest;
 import com.hanguyen.demo_spring_bai1.entity.Semester;
-import com.hanguyen.demo_spring_bai1.exception.ResourceNotFoundException;
 import com.hanguyen.demo_spring_bai1.repository.SemesterRepository;
+import com.hanguyen.demo_spring_bai1.constant.ErrorCode;
+import com.hanguyen.demo_spring_bai1.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +30,6 @@ public class SemesterService {
 
     public Semester getSemesterById(String id) {
         return semesterRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Semester", "id", id));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
     }
 }

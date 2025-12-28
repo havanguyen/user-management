@@ -1,10 +1,10 @@
 package com.hanguyen.demo_spring_bai1.controller;
 
-import com.hanguyen.demo_spring_bai1.dto.request.ApiResponse;
 import com.hanguyen.demo_spring_bai1.dto.request.AuthRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.RefreshTokenRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.RegisterRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.AuthResponse;
+import com.hanguyen.demo_spring_bai1.dto.response.ApiResponse;
 import com.hanguyen.demo_spring_bai1.service.AuthService;
 import com.hanguyen.demo_spring_bai1.service.RegistrationService;
 import jakarta.validation.Valid;

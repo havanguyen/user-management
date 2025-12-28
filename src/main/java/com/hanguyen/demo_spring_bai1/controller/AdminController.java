@@ -1,7 +1,7 @@
 package com.hanguyen.demo_spring_bai1.controller;
 
-import com.hanguyen.demo_spring_bai1.dto.request.ApiResponse;
 import com.hanguyen.demo_spring_bai1.dto.request.accademic.CourseRequest;
+import com.hanguyen.demo_spring_bai1.dto.response.ApiResponse;
 import com.hanguyen.demo_spring_bai1.dto.request.accademic.RegistrationPeriodRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.accademic.SemesterRequest;
 import com.hanguyen.demo_spring_bai1.dto.request.accademic.SubjectRequest;
@@ -80,16 +80,16 @@ public class AdminController {
 
     @GetMapping("/semesters/{semesterId}/courses")
     public ApiResponse<Page<Course>> getCoursesBySemester(
-            @PathVariable String semesterId ,
-            @RequestParam(defaultValue = "0") int page ,
-            @RequestParam(defaultValue = "5") int size ,
-            @RequestParam(defaultValue = "courseCode") String sortBy
-            ) {
-        return ApiResponse.ok(courseService.getCoursesBySemester(semesterId , page , size , sortBy));
+            @PathVariable String semesterId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "courseCode") String sortBy) {
+        return ApiResponse.ok(courseService.getCoursesBySemester(semesterId, page, size, sortBy));
     }
 
     @PostMapping("/registration-periods")
-    public ApiResponse<RegistrationPeriod> createRegistrationPeriod(@Valid @RequestBody RegistrationPeriodRequest request) {
+    public ApiResponse<RegistrationPeriod> createRegistrationPeriod(
+            @Valid @RequestBody RegistrationPeriodRequest request) {
         RegistrationPeriod newPeriod = registrationPeriodService.createPeriod(request);
         return ApiResponse.created("Registration period created successfully", newPeriod);
     }

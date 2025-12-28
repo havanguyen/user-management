@@ -2,7 +2,7 @@ package com.hanguyen.demo_spring_bai1.config;
 
 
 import com.hanguyen.demo_spring_bai1.entity.User;
-import com.hanguyen.demo_spring_bai1.enums.Roles;
+import com.hanguyen.demo_spring_bai1.constant.Roles;
 import com.hanguyen.demo_spring_bai1.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

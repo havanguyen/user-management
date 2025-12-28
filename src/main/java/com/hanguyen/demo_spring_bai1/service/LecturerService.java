@@ -4,9 +4,8 @@ import com.hanguyen.demo_spring_bai1.dto.request.accademic.GradeUpdateRequest;
 import com.hanguyen.demo_spring_bai1.dto.response.StudentInCourseResponse;
 import com.hanguyen.demo_spring_bai1.entity.Course;
 import com.hanguyen.demo_spring_bai1.entity.Enrollment;
-import com.hanguyen.demo_spring_bai1.enums.ErrorCode;
-import com.hanguyen.demo_spring_bai1.exception.BusinessException;
-import com.hanguyen.demo_spring_bai1.exception.ResourceNotFoundException;
+import com.hanguyen.demo_spring_bai1.constant.ErrorCode;
+import com.hanguyen.demo_spring_bai1.exception.AppException;
 import com.hanguyen.demo_spring_bai1.repository.CourseRepository;
 import com.hanguyen.demo_spring_bai1.repository.EnrollmentRepository;
 import com.hanguyen.demo_spring_bai1.repository.LecturerRepository;
@@ -27,18 +26,17 @@ public class LecturerService {
 
     public List<Course> getAssignedCourses(String lecturerId, String semesterId) {
         if (!lecturerRepository.existsById(lecturerId)) {
-            throw new ResourceNotFoundException("Lecturer", "id", lecturerId);
+            throw new AppException(ErrorCode.RESOURCE_NOT_FOUND);
         }
         return courseRepository.findByLecturerIdAndSemesterId(lecturerId, semesterId);
     }
 
     public List<StudentInCourseResponse> getStudentListInCourse(String lecturerId, String courseId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
-
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!course.getLecturer().getId().equals(lecturerId)) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED_VIEW_COURSE_STUDENTS);
+            throw new AppException(ErrorCode.UNAUTHORIZED_VIEW_COURSE_STUDENTS);
         }
 
         List<Enrollment> enrollments = enrollmentRepository.findAllByCourseId(courseId);
@@ -46,7 +44,8 @@ public class LecturerService {
         return enrollments.stream().map(enrollment -> StudentInCourseResponse.builder()
                 .enrollmentId(enrollment.getId())
                 .studentCode(enrollment.getStudent().getStudentCode())
-                .studentFullName(enrollment.getStudent().getUser().getFirstname() + " " + enrollment.getStudent().getUser().getLastname())
+                .studentFullName(enrollment.getStudent().getUser().getFirstname() + " "
+                        + enrollment.getStudent().getUser().getLastname())
                 .grade(enrollment.getGrade())
                 .build()).collect(Collectors.toList());
     }
@@ -54,11 +53,10 @@ public class LecturerService {
     @Transactional
     public Enrollment updateGrade(String lecturerId, GradeUpdateRequest request) {
         Enrollment enrollment = enrollmentRepository.findById(request.getEnrollmentId())
-                .orElseThrow(() -> new ResourceNotFoundException("Enrollment", "id", request.getEnrollmentId()));
-
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!enrollment.getCourse().getLecturer().getId().equals(lecturerId)) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED_UPDATE_GRADE);
+            throw new AppException(ErrorCode.UNAUTHORIZED_UPDATE_GRADE);
         }
 
         enrollment.setGrade(request.getGrade());

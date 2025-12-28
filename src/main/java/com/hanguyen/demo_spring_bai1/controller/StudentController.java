@@ -1,9 +1,8 @@
 package com.hanguyen.demo_spring_bai1.controller;
 
-import com.hanguyen.demo_spring_bai1.dto.request.ApiResponse;
 import com.hanguyen.demo_spring_bai1.dto.response.CourseResponse;
+import com.hanguyen.demo_spring_bai1.dto.response.ApiResponse;
 import com.hanguyen.demo_spring_bai1.dto.response.MyScheduleResponse;
-import com.hanguyen.demo_spring_bai1.entity.Course;
 import com.hanguyen.demo_spring_bai1.entity.Enrollment;
 import com.hanguyen.demo_spring_bai1.service.RegistrationCommandService;
 import com.hanguyen.demo_spring_bai1.service.StudentService;
@@ -14,26 +13,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/student")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StudentController {
 
-      StudentService studentService;
-      RegistrationCommandService registrationCommandService;
+    StudentService studentService;
+    RegistrationCommandService registrationCommandService;
 
     @GetMapping("/courses/open-for-registration")
     @PreAuthorize("hasRole('STUDENT')")
     public ApiResponse<Page<CourseResponse>> getOpenCourses(
-            @RequestParam(defaultValue = "0") int page ,
-            @RequestParam(defaultValue = "5") int size ,
-            @RequestParam(defaultValue = "courseCode") String orderBy ,
-            @RequestParam(defaultValue = "asc") String direction
-    ) {
-        Page<CourseResponse> openCourses = studentService.getOpenCoursesForRegistration(page , size , orderBy , direction);
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "courseCode") String orderBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+        Page<CourseResponse> openCourses = studentService.getOpenCoursesForRegistration(page, size, orderBy, direction);
         return ApiResponse.ok("Open courses fetched successfully", openCourses);
     }
 
@@ -41,8 +37,7 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     public ApiResponse<MyScheduleResponse> getMySchedule(
             @PathVariable String studentId,
-            @RequestParam String semesterId
-    ) {
+            @RequestParam String semesterId) {
         MyScheduleResponse schedule = studentService.getMySchedule(studentId, semesterId);
         return ApiResponse.ok("Schedule fetched successfully", schedule);
     }
@@ -51,8 +46,7 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     public ApiResponse<Enrollment> registerCourse(
             @PathVariable String studentId,
-            @RequestParam String courseId
-    ) {
+            @RequestParam String courseId) {
         Enrollment enrollment = registrationCommandService.registerCourse(studentId, courseId);
         return ApiResponse.created("Course registered successfully", enrollment);
     }
@@ -61,8 +55,7 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     public ApiResponse<Void> dropCourse(
             @PathVariable String studentId,
-            @PathVariable String enrollmentId
-    ) {
+            @PathVariable String enrollmentId) {
         registrationCommandService.dropCourse(studentId, enrollmentId);
         return ApiResponse.ok("Course dropped successfully", null);
     }
