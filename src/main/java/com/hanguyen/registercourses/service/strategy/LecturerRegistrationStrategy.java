@@ -1,5 +1,4 @@
 package com.hanguyen.registercourses.service.strategy;
-
 import com.hanguyen.registercourses.dto.request.RegisterRequest;
 import com.hanguyen.registercourses.entity.Department;
 import com.hanguyen.registercourses.entity.Lecturer;
@@ -11,14 +10,11 @@ import com.hanguyen.registercourses.repository.DepartmentRepository;
 import com.hanguyen.registercourses.repository.LecturerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
 @Component
 @RequiredArgsConstructor
 public class LecturerRegistrationStrategy implements RegistrationStrategy {
-
     private final DepartmentRepository departmentRepository;
     private final LecturerRepository lecturerRepository;
-
     @Override
     public void processRegistration(User user, RegisterRequest request) {
         if (request.getDepartmentId() == null) {
@@ -26,7 +22,6 @@ public class LecturerRegistrationStrategy implements RegistrationStrategy {
         }
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
-
         Lecturer lecturerProfile = Lecturer.builder()
                 .user(user)
                 .lecturerCode(request.getLecturerCode())
@@ -35,7 +30,6 @@ public class LecturerRegistrationStrategy implements RegistrationStrategy {
                 .build();
         lecturerRepository.save(lecturerProfile);
     }
-
     @Override
     public Roles supportedRole() {
         return Roles.LECTURER;

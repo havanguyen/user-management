@@ -1,9 +1,7 @@
 package com.hanguyen.registercourses.dto.response;
-
 import com.hanguyen.registercourses.constant.CourseStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +17,6 @@ public class CourseResponse {
     SubjectResponse subject;
     SemesterResponse semester;
     LecturerResponse lecturer;
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -29,7 +26,6 @@ public class CourseResponse {
         String name;
         int credits;
     }
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -37,7 +33,6 @@ public class CourseResponse {
     public static class SemesterResponse {
         String name;
     }
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

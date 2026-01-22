@@ -1,14 +1,11 @@
 package com.hanguyen.registercourses.mapper;
-
 import com.hanguyen.registercourses.dto.response.CourseResponse;
 import com.hanguyen.registercourses.entity.Course;
 import com.hanguyen.registercourses.entity.Lecturer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
 @Mapper(componentModel = "spring")
 public interface CourseMapper {
-
     @Mapping(target = "lecturer", source = "lecturer")
     @Mapping(target = "subject.subjectCode", source = "subject.subjectCode")
     @Mapping(target = "subject.name", source = "subject.name")

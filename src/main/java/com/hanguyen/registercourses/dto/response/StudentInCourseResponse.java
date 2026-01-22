@@ -1,8 +1,6 @@
 package com.hanguyen.registercourses.dto.response;
-
 import lombok.Builder;
 import lombok.Data;
-
 @Data
 @Builder
 public class StudentInCourseResponse {

@@ -1,11 +1,9 @@
 package com.hanguyen.registercourses.dto.response;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hanguyen.registercourses.entity.User;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 @Builder
 @Data
 @AllArgsConstructor
@@ -15,13 +13,10 @@ import lombok.experimental.FieldDefaults;
 public class AuthResponse {
     @JsonIgnore
     String accessToken;
-
     @JsonIgnore
     String refreshToken;
-
     User user;
     boolean authenticated;
-
     public void clearTokens() {
         this.accessToken = null;
         this.refreshToken = null;

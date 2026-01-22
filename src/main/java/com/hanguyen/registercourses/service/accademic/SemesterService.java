@@ -1,5 +1,4 @@
 package com.hanguyen.registercourses.service.accademic;
-
 import com.hanguyen.registercourses.dto.request.SemesterRequest;
 import com.hanguyen.registercourses.entity.Semester;
 import com.hanguyen.registercourses.repository.SemesterRepository;
@@ -13,13 +12,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SemesterService {
     SemesterRepository semesterRepository;
-
     public Semester createSemester(SemesterRequest request) {
         Semester semester = Semester.builder()
                 .name(request.getName())
@@ -28,12 +25,10 @@ public class SemesterService {
                 .build();
         return semesterRepository.save(semester);
     }
-
     public Page<Semester> getAllSemesters(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
         return semesterRepository.findAll(pageable);
     }
-
     public Semester getSemesterById(String id) {
         return semesterRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));

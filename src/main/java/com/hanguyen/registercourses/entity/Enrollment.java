@@ -1,5 +1,4 @@
 package com.hanguyen.registercourses.entity;
-
 import com.hanguyen.registercourses.constant.EnrollmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,9 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.LocalDateTime;
-
 @NamedEntityGraph(name = "enrollment-with-details", attributeNodes = {
                 @NamedAttributeNode(value = "student", subgraph = "student-with-user-and-major"),
                 @NamedAttributeNode(value = "course", subgraph = "course-with-lecturer-and-subject")
@@ -52,40 +49,25 @@ public class Enrollment {
         @Id
         @GeneratedValue(strategy = GenerationType.UUID)
         String id;
-
         LocalDateTime registrationTime;
-
         Double grade;
-
         @Enumerated(EnumType.STRING)
         EnrollmentStatus status;
-
-        /**
-         * Số thứ tự trong hàng chờ (chỉ dùng khi status = WAITLIST)
-         */
         Integer queueOrder;
-
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "student_id")
         Student student;
-
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "course_id")
         Course course;
-
-        // ==================== Audit Fields ====================
-
         @CreatedDate
         @Column(updatable = false)
         LocalDateTime createdAt;
-
         @LastModifiedDate
         LocalDateTime updatedAt;
-
         @CreatedBy
         @Column(updatable = false)
         String createdBy;
-
         @LastModifiedBy
         String updatedBy;
 }

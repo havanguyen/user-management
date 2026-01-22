@@ -1,5 +1,4 @@
 package com.hanguyen.registercourses.controller;
-
 import com.hanguyen.registercourses.dto.response.CourseResponse;
 import com.hanguyen.registercourses.common.ApiResponse;
 import com.hanguyen.registercourses.common.PageResponse;
@@ -13,16 +12,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 @RestController
 @RequestMapping("/api/student")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StudentController {
-
     StudentService studentService;
     RegistrationCommandService registrationCommandService;
-
     @GetMapping("/courses/open-for-registration")
     @PreAuthorize("hasRole('STUDENT')")
     public ApiResponse<PageResponse<CourseResponse>> getOpenCourses(
@@ -34,7 +30,6 @@ public class StudentController {
                 PageResponse.fromPage(studentService.getOpenCoursesForRegistration(page, size, orderBy, direction)),
                 SuccessCode.GET_OPEN_COURSES_SUCCESSFUL);
     }
-
     @GetMapping("/{studentId}/schedule")
     @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     public ApiResponse<MyScheduleResponse> getMySchedule(
@@ -43,7 +38,6 @@ public class StudentController {
         MyScheduleResponse schedule = studentService.getMySchedule(studentId, semesterId);
         return ApiResponse.buildSuccessResponse(schedule, SuccessCode.GET_SCHEDULE_SUCCESSFUL);
     }
-
     @PostMapping("/{studentId}/enrollments")
     @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     public ApiResponse<Enrollment> registerCourse(
@@ -52,7 +46,6 @@ public class StudentController {
         Enrollment enrollment = registrationCommandService.registerCourse(studentId, courseId);
         return ApiResponse.buildSuccessResponse(enrollment, SuccessCode.REGISTER_COURSE_SUCCESSFUL);
     }
-
     @DeleteMapping("/{studentId}/enrollments/{enrollmentId}")
     @PreAuthorize("hasRole('STUDENT') and authentication.name == @studentRepository.findById(#studentId).get().getUser().getUsername()")
     public ApiResponse<Void> dropCourse(

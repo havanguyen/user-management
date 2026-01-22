@@ -1,5 +1,4 @@
 package com.hanguyen.registercourses.controller;
-
 import com.hanguyen.registercourses.common.CookieUtils;
 import com.hanguyen.registercourses.dto.request.AuthRequest;
 import com.hanguyen.registercourses.dto.request.RefreshTokenRequest;
@@ -16,17 +15,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
-
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class AuthController {
-
     AuthService authService;
     RegistrationService registrationService;
     CookieUtils cookieUtils;
-
     @PostMapping("/login")
     public ApiResponse<AuthResponse> login(@RequestBody @Valid AuthRequest request, HttpServletResponse response) {
         AuthResponse authResponse = authService.login(request);
@@ -34,7 +30,6 @@ public class AuthController {
         authResponse.clearTokens();
         return ApiResponse.buildSuccessResponse(authResponse, SuccessCode.LOGIN_SUCCESSFUL);
     }
-
     @PostMapping("/register")
     public ApiResponse<AuthResponse> register(@Valid @RequestBody RegisterRequest request,
             HttpServletResponse response) {
@@ -43,7 +38,6 @@ public class AuthController {
         authResponse.clearTokens();
         return ApiResponse.buildSuccessResponse(authResponse, SuccessCode.REGISTER_SUCCESSFUL);
     }
-
     @PostMapping("/refresh")
     public ApiResponse<AuthResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = extractRefreshTokenFromCookie(request);
@@ -52,7 +46,6 @@ public class AuthController {
         authResponse.clearTokens();
         return ApiResponse.buildSuccessResponse(authResponse, SuccessCode.REFRESH_TOKEN_SUCCESSFUL);
     }
-
     @PostMapping("/logout")
     public ApiResponse<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = extractRefreshTokenFromCookie(request);
@@ -62,7 +55,6 @@ public class AuthController {
         cookieUtils.clearCookies(response);
         return ApiResponse.buildSuccessResponse(null, SuccessCode.LOGOUT_SUCCESSFUL);
     }
-
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {

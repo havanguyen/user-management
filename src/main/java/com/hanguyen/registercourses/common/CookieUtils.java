@@ -1,11 +1,8 @@
 package com.hanguyen.registercourses.common;
-
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-
-
 @Component
 public class CookieUtils {
     public void setAccessCookie(HttpServletResponse response, String accessToken) {
@@ -18,7 +15,6 @@ public class CookieUtils {
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
     }
-
     public void setRefreshCookie(HttpServletResponse response, String refreshToken) {
         if (refreshToken == null)
             return;
@@ -31,7 +27,6 @@ public class CookieUtils {
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
-
     public void clearCookies(HttpServletResponse response) {
         ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", "")
                 .httpOnly(true)
@@ -40,7 +35,6 @@ public class CookieUtils {
                 .maxAge(0)
                 .sameSite("Lax")
                 .build();
-
         ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", "")
                 .httpOnly(true)
                 .secure(false)

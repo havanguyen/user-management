@@ -1,28 +1,22 @@
 package com.hanguyen.registercourses.exception;
-
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
-
 import com.hanguyen.registercourses.constant.ErrorCode;
 import com.hanguyen.registercourses.common.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
-
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(value = AppException.class)
     public ApiResponse<?> handlingAppException(AppException exception, HttpServletResponse response) {
         return buildResponse(exception.getErrorCode(), null, response);
@@ -71,12 +65,10 @@ public class GlobalExceptionHandler {
         }
         return buildResponse(errorCode, finalMessage, response);
     }
-
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ApiResponse<?> handleMethodNotSupportedException(HttpRequestMethodNotSupportedException exception, HttpServletResponse response) {
         return buildResponse(ErrorCode.METHOD_NOT_ALLOWED, exception.getMessage(), response);
     }
-
     @ExceptionHandler(value = Exception.class)
     public ApiResponse<?> handlingRuntimeException(Exception exception, HttpServletResponse response) {
         log.error("Exception: ", exception);

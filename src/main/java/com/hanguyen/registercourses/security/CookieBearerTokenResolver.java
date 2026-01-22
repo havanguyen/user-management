@@ -1,17 +1,13 @@
 package com.hanguyen.registercourses.security;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.stereotype.Component;
-
 @Component
 public class CookieBearerTokenResolver implements BearerTokenResolver {
-
     private static final String ACCESS_TOKEN_COOKIE_NAME = "ACCESS_TOKEN";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
-
     @Override
     public String resolve(HttpServletRequest request) {
         String token = resolveFromCookie(request);
@@ -20,7 +16,6 @@ public class CookieBearerTokenResolver implements BearerTokenResolver {
         }
         return resolveFromHeader(request);
     }
-
     private String resolveFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
@@ -33,7 +28,6 @@ public class CookieBearerTokenResolver implements BearerTokenResolver {
         }
         return null;
     }
-
     private String resolveFromHeader(HttpServletRequest request) {
         String authorization = request.getHeader(AUTHORIZATION_HEADER);
         if (authorization != null && authorization.startsWith(BEARER_PREFIX)) {

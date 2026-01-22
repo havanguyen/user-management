@@ -1,9 +1,7 @@
 package com.hanguyen.registercourses.entity;
-
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 @NamedEntityGraph(name = "department-basic")
 @Entity
 @Getter

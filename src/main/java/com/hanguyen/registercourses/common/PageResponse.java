@@ -1,12 +1,9 @@
 package com.hanguyen.registercourses.common;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
-
 import java.util.List;
-
 @Getter
 @Setter
 @Builder
@@ -16,7 +13,6 @@ public class PageResponse<T> {
     private int totalPages;
     private long totalItems;
     private int pageSize;
-
     public static <T> PageResponse<T> fromPage(Page<T> page) {
         return PageResponse.<T>builder()
                 .items(page.getContent())

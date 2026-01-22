@@ -1,12 +1,8 @@
 package com.hanguyen.registercourses.dto.response;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 import java.time.LocalDate;
 import java.util.Set;
-
-
 @Builder
 @Data
 @AllArgsConstructor
