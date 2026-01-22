@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  flyway:
+    enabled: false
+
+jwt:
+  secret-key: testsecretkeyfortestingpurposes12345
+  access-token-expiry: 900000
+  refresh-token-expiry: 604800000
