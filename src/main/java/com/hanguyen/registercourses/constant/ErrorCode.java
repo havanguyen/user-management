@@ -86,6 +86,11 @@ public enum ErrorCode {
     START_TIME_REQUIRED("Start time is required", HttpStatus.BAD_REQUEST),
     END_TIME_REQUIRED("End time is required", HttpStatus.BAD_REQUEST),
     END_TIME_FUTURE("End time must be in the future", HttpStatus.BAD_REQUEST),
+
+    // New error codes for enhanced registration
+    TIME_CONFLICT("Schedule conflict with another registered course", HttpStatus.BAD_REQUEST),
+    CREDIT_LIMIT_EXCEEDED("Credit limit exceeded for this semester", HttpStatus.BAD_REQUEST),
+    COURSE_REGISTRATION_CONFLICT("Registration conflict, please try again", HttpStatus.CONFLICT),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

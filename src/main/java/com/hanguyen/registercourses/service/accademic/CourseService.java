@@ -16,6 +16,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,7 @@ public class CourseService {
     SemesterRepository semesterRepository;
     LecturerRepository lecturerRepository;
 
+    @CacheEvict(value = "courses", allEntries = true)
     public Course createCourse(CourseRequest request) {
         log.info("Creating course with code: {}", request.getCourseCode());
 
@@ -63,7 +66,9 @@ public class CourseService {
         return courseRepository.findAll(pageable);
     }
 
+    @Cacheable(value = "courses", key = "#semesterId + '-' + #page + '-' + #size")
     public Page<Course> getCoursesBySemester(String semesterId, int page, int size, String sortBy) {
+        log.info("Fetching courses for semester {} from database (not cached)", semesterId);
         if (!semesterRepository.existsById(semesterId)) {
             throw new AppException(ErrorCode.RESOURCE_NOT_FOUND);
         }

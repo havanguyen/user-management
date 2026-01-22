@@ -16,6 +16,20 @@ spring:
     enabled: false
     baseline-on-migrate: false
 
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  # Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+
 management:
   endpoints:
     web:
@@ -35,3 +49,8 @@ jwt:
   secret-key: "mFIbgAHanwWv+qk8D8sVzvA+gte2ZNUgHQCNDKn0KhA="
   access-token-validity: 3600000
   refresh-token-validity: 604800000
+
+# Registration Configuration
+registration:
+  max-credits-per-semester: 24
+  min-credits-per-semester: 14
