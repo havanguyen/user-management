@@ -33,6 +33,7 @@ public class SecurityConfig {
     private final CookieBearerTokenResolver cookieBearerTokenResolver;
     private final String[] PUBLIC_ENDPOINTS = {
             "/auth/**",
+            "/public/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html"

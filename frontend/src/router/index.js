@@ -58,6 +58,24 @@ const routes = [
                 name: 'LecturerCourses',
                 component: () => import('../views/lecturer/LecturerCourses.vue'),
                 meta: { role: 'LECTURER' }
+            },
+            {
+                path: 'admin/users',
+                name: 'AdminUsers',
+                component: () => import('../views/admin/Users.vue'),
+                meta: { role: 'ADMIN' }
+            },
+            {
+                path: 'admin/registration-periods',
+                name: 'AdminRegistrationPeriods',
+                component: () => import('../views/admin/RegistrationPeriods.vue'),
+                meta: { role: 'ADMIN' }
+            },
+            {
+                path: 'schedule',
+                name: 'StudentSchedule',
+                component: () => import('../views/student/Schedule.vue'),
+                meta: { role: 'STUDENT' }
             }
         ]
     }

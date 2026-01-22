@@ -1,7 +1,9 @@
 package com.hanguyen.registercourses.constant;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import lombok.Getter;
+
 @Getter
 public enum SuccessCode {
     LOGIN_SUCCESSFUL("Login successful", HttpStatus.OK),
@@ -34,11 +36,15 @@ public enum SuccessCode {
     GET_STUDENT_LIST_SUCCESSFUL("Student list fetched successfully", HttpStatus.OK),
     UPDATE_GRADE_SUCCESSFUL("Grade updated successfully", HttpStatus.OK),
     CHANGE_PASSWORD_SUCCESSFUL("Change password successful", HttpStatus.OK),
+    GET_ALL_MAJORS_SUCCESSFUL("Get all majors successful", HttpStatus.OK),
+    GET_ALL_DEPARTMENTS_SUCCESSFUL("Get all departments successful", HttpStatus.OK),
     ;
+
     SuccessCode(String message, HttpStatusCode statusCode) {
         this.message = message;
         this.statusCode = statusCode;
     }
+
     private final String message;
     private final HttpStatusCode statusCode;
 }

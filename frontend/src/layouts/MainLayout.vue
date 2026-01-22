@@ -21,9 +21,13 @@
             <el-icon><Reading /></el-icon>
             <span>Đăng ký môn học</span>
           </el-menu-item>
-          <el-menu-item index="/my-registrations">
+            <el-menu-item index="/my-registrations">
             <el-icon><List /></el-icon>
             <span>Môn đã đăng ký</span>
+          </el-menu-item>
+          <el-menu-item index="/schedule">
+            <el-icon><Calendar /></el-icon>
+            <span>Thời khóa biểu</span>
           </el-menu-item>
         </template>
         <template v-if="authStore.isLecturer">
@@ -39,8 +43,10 @@
               <span>Quản lý</span>
             </template>
             <el-menu-item index="/admin/semesters">Học kỳ</el-menu-item>
+            <el-menu-item index="/admin/registration-periods">Đợt đăng ký</el-menu-item>
             <el-menu-item index="/admin/subjects">Môn học</el-menu-item>
             <el-menu-item index="/admin/courses">Lớp học phần</el-menu-item>
+            <el-menu-item index="/admin/users">Người dùng</el-menu-item>
           </el-sub-menu>
         </template>
       </el-menu>
