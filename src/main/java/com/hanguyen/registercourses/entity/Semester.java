@@ -1,9 +1,10 @@
 package com.hanguyen.registercourses.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
-@NamedEntityGraph(name = "semester-basic")
+
 @Entity
 @Getter
 @Setter

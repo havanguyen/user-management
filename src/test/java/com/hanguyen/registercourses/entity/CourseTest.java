@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,6 +12,16 @@ import static org.junit.jupiter.api.Assertions.*;
 class CourseTest {
 
     Course course;
+
+    private TimeSlot createTimeSlot(int period, String start, String end) {
+        return TimeSlot.builder()
+                .periodNumber(period)
+                .startTime(LocalTime.parse(start))
+                .endTime(LocalTime.parse(end))
+                .displayName("Tiết " + period)
+                .isActive(true)
+                .build();
+    }
 
     @BeforeEach
     void setUp() {
@@ -75,10 +86,15 @@ class CourseTest {
                 .schedules(new ArrayList<>())
                 .build();
 
+        TimeSlot slot1 = createTimeSlot(1, "07:00", "07:45");
+        TimeSlot slot2 = createTimeSlot(2, "07:50", "08:35");
+        TimeSlot slot3 = createTimeSlot(3, "08:40", "09:25");
+        TimeSlot slot4 = createTimeSlot(4, "09:35", "10:20");
+
         CourseSchedule schedule1 = CourseSchedule.builder()
-                .dayOfWeek(2).startPeriod(1).endPeriod(3).build();
+                .dayOfWeek(2).startTimeSlot(slot1).endTimeSlot(slot3).build();
         CourseSchedule schedule2 = CourseSchedule.builder()
-                .dayOfWeek(2).startPeriod(2).endPeriod(4).build();
+                .dayOfWeek(2).startTimeSlot(slot2).endTimeSlot(slot4).build();
 
         course.getSchedules().add(schedule1);
         otherCourse.getSchedules().add(schedule2);
@@ -93,10 +109,13 @@ class CourseTest {
                 .schedules(new ArrayList<>())
                 .build();
 
+        TimeSlot slot1 = createTimeSlot(1, "07:00", "07:45");
+        TimeSlot slot3 = createTimeSlot(3, "08:40", "09:25");
+
         CourseSchedule schedule1 = CourseSchedule.builder()
-                .dayOfWeek(2).startPeriod(1).endPeriod(3).build();
+                .dayOfWeek(2).startTimeSlot(slot1).endTimeSlot(slot3).build();
         CourseSchedule schedule2 = CourseSchedule.builder()
-                .dayOfWeek(3).startPeriod(1).endPeriod(3).build();
+                .dayOfWeek(3).startTimeSlot(slot1).endTimeSlot(slot3).build();
 
         course.getSchedules().add(schedule1);
         otherCourse.getSchedules().add(schedule2);
@@ -107,8 +126,11 @@ class CourseTest {
     @Test
     @DisplayName("Should add schedule to course")
     void addSchedule_success() {
+        TimeSlot slot1 = createTimeSlot(1, "07:00", "07:45");
+        TimeSlot slot3 = createTimeSlot(3, "08:40", "09:25");
+
         CourseSchedule schedule = CourseSchedule.builder()
-                .dayOfWeek(2).startPeriod(1).endPeriod(3).build();
+                .dayOfWeek(2).startTimeSlot(slot1).endTimeSlot(slot3).build();
 
         course.addSchedule(schedule);
 

@@ -1,4 +1,5 @@
 package com.hanguyen.registercourses.service.accademic;
+
 import com.hanguyen.registercourses.dto.request.CourseRequest;
 import com.hanguyen.registercourses.entity.Course;
 import com.hanguyen.registercourses.entity.Lecturer;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,6 +33,7 @@ public class CourseService {
     SubjectRepository subjectRepository;
     SemesterRepository semesterRepository;
     LecturerRepository lecturerRepository;
+
     @CacheEvict(value = "courses", allEntries = true)
     public Course createCourse(CourseRequest request) {
         log.info("Creating course with code: {}", request.getCourseCode());
@@ -52,10 +55,12 @@ public class CourseService {
                 .build();
         return courseRepository.save(course);
     }
+
     public Page<Course> getAllCourses(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
         return courseRepository.findAll(pageable);
     }
+
     @Cacheable(value = "courses", key = "#semesterId + '-' + #page + '-' + #size")
     public Page<Course> getCoursesBySemester(String semesterId, int page, int size, String sortBy) {
         log.info("Fetching courses for semester {} from database (not cached)", semesterId);
@@ -63,8 +68,9 @@ public class CourseService {
             throw new AppException(ErrorCode.RESOURCE_NOT_FOUND);
         }
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
-        return courseRepository.findBySemesterId(semesterId, pageable);
+        return courseRepository.findBySemesterIdWithDetails(semesterId, pageable);
     }
+
     public Course getCourseById(String courseId) {
         return courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));

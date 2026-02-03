@@ -1,4 +1,5 @@
 package com.hanguyen.registercourses.config;
+
 import com.hanguyen.registercourses.constant.CourseStatus;
 import com.hanguyen.registercourses.constant.Roles;
 import com.hanguyen.registercourses.entity.*;
@@ -14,13 +15,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
+
 @Configuration
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
+
     @Bean
     @Transactional
     ApplicationRunner applicationRunner(
@@ -31,12 +35,14 @@ public class ApplicationInitConfig {
             SubjectRepository subjectRepository,
             LecturerRepository lecturerRepository,
             StudentRepository studentRepository,
-            CourseRepository courseRepository) {
+            CourseRepository courseRepository,
+            TimeSlotRepository timeSlotRepository) {
         return args -> {
             if (userRepository.findByUsername("superadmin").isEmpty()) {
                 createUser(userRepository, "superadmin", "admin", "Super", "Admin", Roles.ADMIN);
                 log.info("Admin account created.");
             }
+            List<TimeSlot> timeSlots = initializeTimeSlots(timeSlotRepository);
             if (departmentRepository.count() > 0)
                 return;
             log.info("Starting massive data seeding...");
@@ -92,27 +98,28 @@ public class ApplicationInitConfig {
                 List<Lecturer> deptLecturers = lecturers.stream()
                         .filter(l -> l.getDepartment().getId().equals(sub.getDepartment().getId()))
                         .toList();
-                int numCourses = 2 + rand.nextInt(2); 
+                int numCourses = 2 + rand.nextInt(2);
                 for (int i = 1; i <= numCourses; i++) {
                     Lecturer lec = deptLecturers.get(rand.nextInt(deptLecturers.size()));
-                    String courseCode = sub.getSubjectCode() + ".M" + (10 + i); 
+                    String courseCode = sub.getSubjectCode() + ".M" + (10 + i);
                     Course course = Course.builder()
                             .courseCode(courseCode)
                             .subject(sub)
                             .semester(sem)
                             .lecturer(lec)
-                            .maxStudents(30 + rand.nextInt(31)) 
+                            .maxStudents(30 + rand.nextInt(31))
                             .currentStudents(0)
                             .status(CourseStatus.OPEN_FOR_REGISTRATION)
                             .scheduleInfo(generateScheduleInfo(rand))
                             .schedules(new ArrayList<>())
                             .build();
-                    int day = 2 + rand.nextInt(6); 
-                    int start = 1 + rand.nextInt(5); 
+                    int day = 2 + rand.nextInt(6);
+                    int startPeriodIdx = rand.nextInt(Math.min(5, timeSlots.size()));
+                    int endPeriodIdx = Math.min(startPeriodIdx + 3, timeSlots.size() - 1);
                     CourseSchedule sch = CourseSchedule.builder()
                             .dayOfWeek(day)
-                            .startPeriod(start)
-                            .endPeriod(start + 3)
+                            .startTimeSlot(timeSlots.get(startPeriodIdx))
+                            .endTimeSlot(timeSlots.get(endPeriodIdx))
                             .course(course)
                             .build();
                     course.getSchedules().add(sch);
@@ -134,6 +141,40 @@ public class ApplicationInitConfig {
             log.info("Massive data seeding completed!");
         };
     }
+
+    private List<TimeSlot> initializeTimeSlots(TimeSlotRepository repo) {
+        if (repo.count() > 0) {
+            return repo.findAllByIsActiveTrueOrderByPeriodNumber();
+        }
+        List<TimeSlot> slots = new ArrayList<>();
+        String[][] slotData = {
+                { "1", "07:00", "07:45", "Tiết 1" },
+                { "2", "07:50", "08:35", "Tiết 2" },
+                { "3", "08:40", "09:25", "Tiết 3" },
+                { "4", "09:35", "10:20", "Tiết 4" },
+                { "5", "10:25", "11:10", "Tiết 5" },
+                { "6", "11:15", "12:00", "Tiết 6" },
+                { "7", "12:30", "13:15", "Tiết 7" },
+                { "8", "13:20", "14:05", "Tiết 8" },
+                { "9", "14:10", "14:55", "Tiết 9" },
+                { "10", "15:05", "15:50", "Tiết 10" },
+                { "11", "15:55", "16:40", "Tiết 11" },
+                { "12", "16:45", "17:30", "Tiết 12" }
+        };
+        for (String[] data : slotData) {
+            TimeSlot slot = TimeSlot.builder()
+                    .periodNumber(Integer.parseInt(data[0]))
+                    .startTime(LocalTime.parse(data[1]))
+                    .endTime(LocalTime.parse(data[2]))
+                    .displayName(data[3])
+                    .isActive(true)
+                    .build();
+            slots.add(repo.save(slot));
+        }
+        log.info("TimeSlots initialized with {} periods", slots.size());
+        return slots;
+    }
+
     private User createUser(UserRepository repo, String username, String password, String first, String last,
             Roles role) {
         Set<Roles> roles = new HashSet<>();
@@ -147,17 +188,21 @@ public class ApplicationInitConfig {
                 .build();
         return repo.save(user);
     }
+
     private Department createDepartment(DepartmentRepository repo, String name, String code) {
         return repo.save(Department.builder().name(name).departmentCode(code).build());
     }
+
     private void createMajor(MajorRepository repo, String name, String code, Department dept, double price) {
         repo.save(Major.builder().name(name).majorCode(code).department(dept).pricePerCredit(BigDecimal.valueOf(price))
                 .build());
     }
+
     private Subject createSubject(SubjectRepository repo, String name, String code, int credits, Department dept) {
         return repo.save(Subject.builder().name(name).subjectCode(code).credits(credits).department(dept)
                 .prerequisites(new HashSet<>()).build());
     }
+
     private String generateScheduleInfo(Random rand) {
         int day = 2 + rand.nextInt(6);
         return "Thứ " + day + " (Tiết " + (1 + rand.nextInt(3)) + "-" + (4 + rand.nextInt(3)) + ")";

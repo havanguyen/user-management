@@ -1,11 +1,10 @@
 package com.hanguyen.registercourses.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
-@NamedEntityGraph(name = "major-with-details", attributeNodes = {
-                @NamedAttributeNode("department")
-})
+
 @Entity
 @Table(name = "major")
 @Getter

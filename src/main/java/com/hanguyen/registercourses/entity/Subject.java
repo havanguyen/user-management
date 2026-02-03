@@ -1,12 +1,10 @@
 package com.hanguyen.registercourses.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.util.Set;
-@NamedEntityGraph(name = "subject-with-details", attributeNodes = {
-                @NamedAttributeNode("department"),
-                @NamedAttributeNode("prerequisites")
-})
+
 @Entity
 @Getter
 @Setter

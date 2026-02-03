@@ -1,4 +1,5 @@
 package com.hanguyen.registercourses.service.registration;
+
 import com.hanguyen.registercourses.dto.response.CourseResponse;
 import com.hanguyen.registercourses.dto.response.MyScheduleResponse;
 import com.hanguyen.registercourses.entity.*;
@@ -20,15 +21,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StudentService {
         private final CourseRepository courseRepository;
         private final RegistrationPeriodRepository registrationPeriodRepository;
         private final StudentRepository studentRepository;
         private final EnrollmentRepository enrollmentRepository;
         private final CourseMapper courseMapper;
+
         @Transactional(readOnly = true)
         public Page<CourseResponse> getOpenCoursesForRegistration(int page, int size, String sortBy, String direction) {
                 RegistrationPeriod activePeriod = registrationPeriodRepository.findByIsActiveTrue()
@@ -38,9 +41,10 @@ public class StudentService {
                                 ? Sort.by(sortBy).descending()
                                 : Sort.by(sortBy).ascending();
                 Pageable pageable = PageRequest.of(page, size, sort);
-                Page<Course> courses = courseRepository.findBySemesterId(semesterId, pageable);
+                Page<Course> courses = courseRepository.findBySemesterIdWithDetails(semesterId, pageable);
                 return courses.map(courseMapper::toCourseResponse);
         }
+
         public MyScheduleResponse getMySchedule(String studentId, String semesterId) {
                 Student student = studentRepository.findById(studentId)
                                 .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));

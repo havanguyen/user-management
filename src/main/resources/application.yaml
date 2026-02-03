@@ -54,3 +54,4 @@ jwt:
 registration:
   max-credits-per-semester: 24
   min-credits-per-semester: 14
+  async-enabled: false
